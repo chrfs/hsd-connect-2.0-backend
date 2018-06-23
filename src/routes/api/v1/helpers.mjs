@@ -1,3 +1,6 @@
+import bcrypt from 'bcrypt';
+import env from '../../../config/env.mjs';
+
 export const formatResponse = (response) => {
   if(!!response.errors || !!response.data){
     const formatedResponse = {};
@@ -14,5 +17,6 @@ export const formatResponse = (response) => {
     }
   
 		return formatedResponse;
-	}
+  }
+  return response;
 }

@@ -5,6 +5,7 @@
     "ecmaVersion": 2018,
     "ecmaFeatures": {
       "globalReturn": false,
+      "import/parser": "babel-eslint",
       "impliedStrict": false,
       "jsx": false,
       "experimentalObjectRestSpread": false

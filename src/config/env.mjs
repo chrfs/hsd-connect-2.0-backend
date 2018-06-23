@@ -3,10 +3,18 @@ export default (((env) => {
   switch (env) {
     case 'development': {
       return {
+        TYPE: 'development',
         API: {
           VERSION: '1.0.0',
           PATH: '/api/v1',
           PORT: 3000
+        },
+        BCRYPT: {
+          SALT_ROUNDS: 14
+        },
+        JWT: {
+          SECRET: 'B§J§U§h/()OIQNIQOJ§728ihf27uh2b§/uhge7wudh29_/(UWw/(/DH',
+          EXPIRES_IN: '1h'
         }
       };
     }
