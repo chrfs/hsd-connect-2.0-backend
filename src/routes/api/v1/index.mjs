@@ -1,12 +1,13 @@
-import KoaRouter from 'koa-router';
-import env from '../../../config/env';
+import KoaRouter from 'koa-router'
+import env from '../../../config/env'
+import version from './version'
+import users from './users'
 
 const router = new KoaRouter({
   prefix: env.API.PATH
-});
+})
 
-router.get('/', (ctx) => {
-  ctx.body = `API_VERSION: ${env.API.VERSION}`;
-});
+router.use(version.routes())
+router.use(users.routes())
 
-export default router;
+export default router

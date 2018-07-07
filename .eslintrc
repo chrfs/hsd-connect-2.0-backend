@@ -5,6 +5,7 @@
     "ecmaVersion": 2018,
     "ecmaFeatures": {
       "globalReturn": false,
+      "import/parser": "babel-eslint",
       "impliedStrict": false,
       "jsx": false,
       "experimentalObjectRestSpread": false
@@ -19,6 +20,9 @@
     "jsx-a11y/img-has-alt": [0],
     "jsx-a11y/href-no-hash": "off",
     "jsx-a11y/anchor-is-valid": "off",
+    "no-underscore-dangle": "off",
+    "no-irregular-whitespace": "off",
+    "keyword-spacing": "off",
     "no-shadow": "off",
     "quotes": ["error", "single"],
     "indent": 0,

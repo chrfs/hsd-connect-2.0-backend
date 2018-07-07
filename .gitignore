@@ -3,6 +3,7 @@ node_modules
 /dist
 
 # local env files
+env.mjs
 .env.local
 .env.*.local
 

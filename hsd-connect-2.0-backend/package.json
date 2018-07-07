@@ -1,0 +1,26 @@
+{
+  "name": "hsd_connect_2_0_backend",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "ssh://git@gitlab.chrcode.com:3000/hsd/hsd-connect-2.0/backend.git",
+  "author": "Abdelmoez Cherif <a.cherif@me.com>",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "^2.5.1",
+    "koa-router": "^7.4.0"
+  },
+  "scripts": {
+    "dev": "nodemon --watch src --ext mjs,js --exec 'eslint ./src/**/*.mjs && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./src/index.mjs'"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint": "^4.19.1",
+    "eslint-cli": "^1.1.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.8.2",
+    "nodemon": "^1.17.5"
+  }
+}

@@ -1,5 +1,5 @@
-# HSD CONNECT
+# HSD CONNECT Backend
 
 [![Standard - JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-Plattform to find Projects and Collaborations
+HSD Plattform to find Projects and Collaborations within the Hochschule Duesseldorf University
