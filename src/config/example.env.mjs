@@ -13,7 +13,7 @@ export default (env => {
           SALT_ROUNDS: 14
         },
         JWT: {
-          SECRET: 'B§J§U§h/()OIQNIQOJ§728ihf27uh2b§/uhge7wudh29_/(UWw/(/DH',
+          SECRET: 'secret',
           EXPIRES_IN: '1h'
         }
       }
