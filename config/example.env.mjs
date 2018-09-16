@@ -15,6 +15,10 @@ export default (env => {
         JWT: {
           SECRET: 'secret',
           EXPIRES_IN: '1h'
+        },
+        MONGO: {
+          USERNAME: 'user',
+          PASSWORD: 'secret'
         }
       }
     }

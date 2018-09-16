@@ -1,9 +1,8 @@
-import KoaRouter from 'koa-router'
+import express from 'express'
 import env from '../config/env'
 
-const router = new KoaRouter();
-(async () =>
-  router.use((await import(`.${env.API.PATH}`)).default.routes())
-)()
+const router = express.Router()
+const loadAPI = async () => router.use(env.API.PATH, (await import(`.${env.API.PATH}`)).default);
 
+loadAPI();
 export default router

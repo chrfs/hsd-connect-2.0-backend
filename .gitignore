@@ -15,10 +15,13 @@ yarn.lock
 
 # Editor directories and files
 .idea
-.vscode
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw*
 .git*
+
+# docker files
+docker-compose.yml
+docker-compose.yaml
