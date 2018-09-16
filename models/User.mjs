@@ -2,12 +2,12 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import env from '../config/env.mjs'
 
-const mailSchema = {
+const mailValidation = {
   regExp: /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i, // eslint-disable-line
   suffix: ['study.hs-duesseldorf.de']
 }
 
-const passwordSchema = {
+const passwordValidation = {
   regExp: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#%&])(?=.{8,32})/
 }
 
@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Bitte verwende Deine gültige HSD E-Mail Adresse.'],
     validate: {
       validator: userMail =>
-        mailSchema.regExp.test(userMail) &&
-        mailSchema.suffix.some(suffix =>
+        mailValidation.regExp.test(userMail) &&
+        mailValidation.suffix.some(suffix =>
           new RegExp(`${suffix}$`).test(
             userMail.toLowerCase().replace(/\s/g, '')
           )
@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Bitte gebe ein gültiges Passwort ein.'],
     validate: {
-      validator: userPassword => passwordSchema.regExp.test(userPassword),
+      validator: userPassword => passwordValidation.regExp.test(userPassword),
       message:
         'Dein Passwort muss aus einem Klein- & Großbuchstaben, einer Zahl, einem Sonderzeichen (!@#%&) bestehen und zwischen acht bis 32 Zeichen lang sein.'
     }
@@ -85,6 +85,7 @@ userSchema.pre('save', hashPassword)
 userSchema.pre('save', setName)
 
 const User = mongoose.model('users', userSchema)
+
 const predefinedFields = {
   settings: 0,
   authorization: 0,
@@ -94,18 +95,18 @@ const predefinedFields = {
 export const createUser = async newUser => {
   try {
     const emailIsUnique = !(await User.find({ email: newUser.email })).length
-    if (emailIsUnique) {
-      return new User(Object.assign(newUser, predefinedFields)).save()
-    }
-    const err = {
-      errors: {
-        email: {
-          message:
-            'Unter der angegebenen E-Mail Adresse existiert bereits ein Zugang.'
+    if (!emailIsUnique) {
+      throw new Error({
+        errors: {
+          email: {
+            message:
+              'Unter der angegebenen E-Mail Adresse existiert bereits ein Zugang.'
+          }
         }
-      }
+      })
     }
-    throw err
+
+    return new User(Object.assign(newUser, predefinedFields)).save()
   } catch (err) {
     throw err
   }

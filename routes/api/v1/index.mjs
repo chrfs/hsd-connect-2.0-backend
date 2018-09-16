@@ -1,6 +1,6 @@
 import KoaRouter from 'koa-router'
 import env from '../../../config/env'
-import version from './version'
+import version from '../version'
 import users from './users'
 
 const router = new KoaRouter({

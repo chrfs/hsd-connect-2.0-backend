@@ -5,11 +5,10 @@ import env from '../../../config/env'
 export default (ctx, next) => {
   try {
     const authorization = jwt.verify(ctx.header.authorization, env.JWT.SECRET)
-    if (authorization) {
-      next()
-    } else {
+    if (!authorization) {
       throw new Error()
     }
+    next()
   } catch (err) {
     const error = {
       errors: {
