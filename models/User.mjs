@@ -3,15 +3,6 @@ import bcrypt from 'bcrypt'
 import env from '../config/env.mjs'
 import * as userValidator from '../utils/validators/user'
 
-const mailValidation = {
-  regExp: /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i, // eslint-disable-line
-  suffix: ['study.hs-duesseldorf.de']
-}
-
-const passwordValidation = {
-  regExp: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#%&])(?=.{8,32})/
-}
-
 const userSchema = new mongoose.Schema({
   firstname: {
     type: String
@@ -56,9 +47,13 @@ const userSchema = new mongoose.Schema({
 })
 
 const setNameFromEmail = function () {
-  const firstname = this.email.substring(0, this.email.indexOf('.')).toLowerCase()
+  const firstname = this.email
+    .substring(0, this.email.indexOf('.'))
+    .toLowerCase()
   this.firstname = firstname.charAt(0).toUpperCase() + firstname.slice(1)
-  const lastname = this.email.substring(this.email.indexOf('.') + 1, this.email.indexOf('@')).toLowerCase()
+  const lastname = this.email
+    .substring(this.email.indexOf('.') + 1, this.email.indexOf('@'))
+    .toLowerCase()
   this.lastname = lastname.charAt(0).toUpperCase() + lastname.slice(1)
 }
 
@@ -73,18 +68,15 @@ const setHashedPassword = async function () {
 
 userSchema.pre('save', setNameFromEmail)
 userSchema.pre('save', setHashedPassword)
-
+userSchema.path('email').validate(async function (email) {
+    return !(await User.find({ email: email })).length
+  }, 'An User with this E-Mail already exists.')
 const User = mongoose.model('users', userSchema)
-
 
 export const getAllUsers = () => User.find()
 
 export const createUser = async newUser => {
   try {
-    const emailIsUnique = !(await User.find({ email: newUser.email })).length
-    if (!emailIsUnique) {
-      throw new Error({email:'Unter der angegebenen E-Mail Adresse existiert bereits ein Zugang.'})
-    }
     const predefinedFields = {
       settings: 0,
       authorization: 0,

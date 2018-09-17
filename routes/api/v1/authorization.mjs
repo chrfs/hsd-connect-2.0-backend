@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken'
-import helpers from './helpers.js'
 import env from '../../../config/env'
 
 export default (req, res, next) => {
   try {
-    const authorization = jwt.verify(ctx.header.authorization, env.JWT.SECRET)
+    const authorization = jwt.verify(req.header.authorization, env.JWT.SECRET)
     if (!authorization) {
-      res.status(401).end();
+      res.status(401).end()
     }
     next()
   } catch (err) {

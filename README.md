@@ -2,14 +2,19 @@
 
 [![Standard - JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-HSDConnect is a Plattform to find Projects and Collaborations within the HSD University. This is the
-API backend of the system and builds on KoaJS as HTTP-Handler, MongoDB as documentbased database and MongooseJS as ODM. The CodeGuidlines are strict standardJS.
+HSDConnect is a Plattform to find Projects and Collaborations within the HSD University. The architecture is splitted into two seperate parts, this is the API backend of the system and builds on ExpressJS as Web-Framework, MongoDB as documentbased database and MongooseJS as ODM. The CodeGuidlines are strict standardJS.
 
 ## Get started:
 
 ### Install dependencies:
 
 `npm install`
+
+### Create the environment config `config/env.mjs` and the `docker-compose.dev.yml` 
+* Therefore copy the exiting files, remove `example.` of the filename.
+* Customize the configs for your needs, if neccassary.
+* Keep in mind to update the example configs, if you decide to add some properties into your config files.
+* Do not push sensitive credentials of any kind into the repo or somewhere else, unless it is production.
 
 ### Start Server:
 

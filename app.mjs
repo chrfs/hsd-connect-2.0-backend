@@ -19,7 +19,9 @@ mongooseConnection.on('error', err => {
 })
 mongooseConnection.once('open', () => {
   console.log('Connection to database is established')
-  console.log(`API is up running on http://${env.API.HOST}:${env.API.PORT}${env.API.PATH}`)
+  console.log(
+    `API is up running on http://${env.API.HOST}:${env.API.PORT}${env.API.PATH}`
+  )
 })
 
 app.listen(env.API.PORT)

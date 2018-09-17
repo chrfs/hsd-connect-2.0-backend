@@ -14,7 +14,7 @@
     "mongoose": "^5.2.15"
   },
   "scripts": {
-    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"src/**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./app.mjs'",
+    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"./**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./app.mjs'",
     "prettify": "prettier-standard \"./**/*.mjs\"",
     "start": "NODE_ENV=production node --experimental-modules --harmony-dynamic-import ./app.mjs"
   },
