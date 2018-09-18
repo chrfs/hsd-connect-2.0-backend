@@ -1,11 +1,11 @@
-import express from 'express'
-import bodyParser from 'body-parser'
-import cors from 'cors'
+import Koa from 'koa'
+import bodyParser from 'koa-bodyparser'
+import cors from '@koa/cors'
 import mongoose from 'mongoose'
 import env from './config/env'
-import routes from './routes'
+import api from './routes'
 
-const app = express()
+const app = new Koa()
 const mongooseOptions = {
   user: env.MONGO.USERNAME,
   pass: env.MONGO.PASSWORD,
@@ -20,11 +20,17 @@ mongooseConnection.on('error', err => {
 mongooseConnection.once('open', () => {
   console.log('Connection to database is established')
   console.log(
-    `API is up running on http://${env.API.HOST}:${env.API.PORT}${env.API.PATH}`
+    `API is up running on http://${env.API.HOST}:${env.API.PORT}${env.API.PATH}/`
   )
 })
 
 app.listen(env.API.PORT)
-app.use(bodyParser.json())
-app.use(cors())
-app.use(routes)
+if (env.TYPE === 'development') app.use(cors())
+app.use(
+  bodyParser({
+    detectJSON: function (ctx) {
+      return /\.json$/i.test(ctx.path)
+    }
+  })
+)
+app.use(api.routes())

@@ -69,8 +69,8 @@ const setHashedPassword = async function () {
 userSchema.pre('save', setNameFromEmail)
 userSchema.pre('save', setHashedPassword)
 userSchema.path('email').validate(async function (email) {
-    return !(await User.find({ email: email })).length
-  }, 'An User with this E-Mail already exists.')
+  return !(await User.find({ email: email })).length
+}, 'An User with this E-Mail already exists.')
 const User = mongoose.model('users', userSchema)
 
 export const getAllUsers = () => User.find()

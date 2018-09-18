@@ -1,13 +1,10 @@
-import express from 'express'
+import Router from 'koa-router'
 
-const router = express.Router()
+const router = new Router()
 
-router.use((req, res, next) => {
-  res
-    .send('Oops, something went wrong ;/!')
-    .status(404)
-    .end()
-  return null
+router.all('/*', async ctx => {
+  ctx.body = 'Oh snap, something went wrong ;/!'
+  ctx.status = 404
 })
 
 export default router

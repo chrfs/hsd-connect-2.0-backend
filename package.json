@@ -6,17 +6,21 @@
   "author": "Abdelmoez Cherif <a.cherif@me.com>",
   "license": "MIT",
   "dependencies": {
+    "@koa/cors": "^2.2.2",
     "bcrypt": "^2.0.1",
-    "body-parser": "^1.18.3",
-    "cors": "^2.8.4",
-    "express": "^4.16.3",
+    "install": "^0.12.1",
     "jsonwebtoken": "^8.3.0",
-    "mongoose": "^5.2.15"
+    "koa": "^2.5.3",
+    "koa-bodyparser": "^2.5.0",
+    "koa-mount": "^3.0.0",
+    "koa-router": "^7.4.0",
+    "mongoose": "^5.2.15",
+    "npm": "^6.4.1"
   },
   "scripts": {
-    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"./**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./app.mjs'",
-    "prettify": "prettier-standard \"./**/*.mjs\"",
-    "start": "NODE_ENV=production node --experimental-modules --harmony-dynamic-import ./app.mjs"
+    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"./**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./server.mjs'",
+    "prettier": "prettier-standard \"./**/*.mjs\"",
+    "start": "NODE_ENV=production node --experimental-modules --harmony-dynamic-import ./server.mjs"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.5",

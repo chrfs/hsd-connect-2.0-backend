@@ -1,10 +1,12 @@
-import express from 'express'
+import Router from 'koa-router'
 import env from '../../config/env'
 
-const router = express.Router()
+const router = new Router({
+  prefix: '/'
+})
 
-router.get('/', (req, res) => {
-  res.send(`API_VERSION: ${env.API.VERSION}`)
+router.get('/', ctx => {
+  ctx.body = `API_VERSION: ${env.API.VERSION}`
 })
 
 export default router
