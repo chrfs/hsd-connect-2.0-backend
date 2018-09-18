@@ -1,77 +1,58 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcrypt'
-import env from '../config/env.mjs'
-import * as userValidator from '../utils/validators/user'
+import * as schemaHelper from '../utils/models/schemaHelper'
+import * as userHelper from '../utils/models/userHelper'
 
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   firstname: {
-    type: String
+    type: mongoose.Schema.Types.String
   },
   lastname: {
-    type: String
+    type: mongoose.Schema.Types.String
   },
   email: {
-    type: String,
+    type: mongoose.Schema.Types.String,
     unique: true,
     required: [true, 'Bitte verwende Deine gültige HSD E-Mail Adresse.'],
     validate: {
-      validator: userValidator.validateEmail,
+      validator: userHelper.validateEmail,
       message: 'Bitte verwende Deine gültige HSD E-Mail Adresse.'
     }
   },
   password: {
-    type: String,
+    type: mongoose.Schema.Types.String,
     required: [true, 'Bitte gebe ein gültiges Passwort ein.'],
     validate: {
-      validator: userValidator.validatePassword,
+      validator: userHelper.validatePassword,
       message:
         'Dein Passwort muss aus einem Klein- & Großbuchstaben, einer Zahl, einem Sonderzeichen (!@#%&) bestehen und zwischen acht bis 32 Zeichen lang sein.'
     }
   },
   settings: {
-    type: Number,
+    type: mongoose.Schema.Types.Number,
     default: 0
   },
   authorization: {
-    type: Number,
+    type: mongoose.Schema.Types.Number,
     default: 0
   },
   active: {
-    type: Boolean,
+    type: mongoose.Schema.Types.Boolean,
     default: true
   },
   created_at: {
-    type: Date,
+    type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
 })
 
-const setNameFromEmail = function () {
-  const firstname = this.email
-    .substring(0, this.email.indexOf('.'))
-    .toLowerCase()
-  this.firstname = firstname.charAt(0).toUpperCase() + firstname.slice(1)
-  const lastname = this.email
-    .substring(this.email.indexOf('.') + 1, this.email.indexOf('@'))
-    .toLowerCase()
-  this.lastname = lastname.charAt(0).toUpperCase() + lastname.slice(1)
-}
-
-const setHashedPassword = async function () {
-  try {
-    const salt = await bcrypt.genSalt(env.BCRYPT.SALT_ROUNDS)
-    this.password = bcrypt.hashSync(this.password, salt)
-  } catch (err) {
-    throw err
-  }
-}
-
-userSchema.pre('save', setNameFromEmail)
-userSchema.pre('save', setHashedPassword)
-userSchema.path('email').validate(async function (email) {
+UserSchema.pre('save', userHelper.setNameFromEmail)
+UserSchema.pre('save', userHelper.setHashedPassword)
+UserSchema.pre('save', schemaHelper.setDate('updatedAt'))
+UserSchema.path('email').validate(async function (email) {
   return !(await User.find({ email: email })).length
 }, 'An User with this E-Mail already exists.')
-const User = mongoose.model('users', userSchema)
+
+const User = mongoose.model('users', UserSchema)
 
 export const getAllUsers = () => User.find()
 
@@ -89,7 +70,6 @@ export const createUser = async newUser => {
   }
 }
 
-export const updateUser = userQuery =>
-  User.update({ _id: userQuery._id }, userQuery)
+export const updateUser = query => User.update({ _id: query._id }, query)
 
-export const findUserByQuery = userQuery => User.find(userQuery)
+export const findUser = query => User.find(query)

@@ -1,57 +1,63 @@
 import mongoose from 'mongoose'
+import * as schemaHelper from '../utils/models/schemaHelper'
 
-const projectSchema = new mongoose.Schema({
+const ProjectSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
   title: {
-    type: String,
-    required: [true, 'Bitte gib einen aussagekräftigen Titel ein.']
+    type: mongoose.Schema.Types.String,
+    required: [true, 'Please enter a proper title.'],
+    validate: {
+      validator: schemaHelper.validateLength(15, 30),
+      message: 'The title length has to be between 15 and 30 characters.'
+    }
   },
-  text1: {
-    type: String,
-    required: [true, 'Bitte beschreibe dein Projektziel näher.']
-  },
-  text2: {
-    type: String,
-    required: [true, 'Bitte gib einen aussagekräftigen Titel ein.']
-  },
-  text3: {
-    type: String,
-    required: [true, 'Bitte gib einen aussagekräftigen Titel ein.']
+  description: {
+    type: mongoose.Schema.Types.Array,
+    validate: {
+      validator: schemaHelper.validateLength(200, 1000),
+      message:
+        'The description length has to be between 200 and 1000 characters.'
+    }
   },
   keywords: {
-    type: Array
+    type: mongoose.Schema.Types.Array
   },
-  team: {
-    type: Boolean,
+  isSearchingForParticipants: {
+    type: mongoose.Schema.Types.Boolean,
     default: false
   },
   status: {
-    type: String,
-    default: 'Start'
+    type: mongoose.Schema.Types.String,
+    required: true,
+    values: ['getting started', 'w.i.p.', 'already finished']
   },
-  created_at: {
-    type: Date,
+  createdAt: {
+    type: mongoose.Schema.Types.Date,
+    default: Date.now()
+  },
+  updatedAt: {
+    type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
 })
 
-const Project = mongoose.model('projects', projectSchema)
+ProjectSchema.pre('save', schemaHelper.setDate('updatedAt'))
+
+const Project = mongoose.model('projects', ProjectSchema)
 
 export const getAllProjects = () => Project.find()
 
 export const createProject = async newProject => {
   try {
-    const predefinedFields = {
-      team: false,
-      status: 'Start',
-      created_at: Date.now()
-    }
-    return new Project(Object.assign(newProject, predefinedFields)).save()
+    return new Project(newProject).save()
   } catch (err) {
     throw err
   }
 }
 
-export const updateProject = projectQuery =>
-  Project.update({ _id: projectQuery._id }, projectQuery)
+export const updateProject = query => Project.update({ _id: query._id }, query)
 
-export const findProjectByQuery = projectQuery => Project.find(projectQuery)
+export const findProject = query => Project.find(query)

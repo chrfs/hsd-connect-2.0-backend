@@ -8,6 +8,7 @@ export default (env => {
           VERSION: '1.0.0',
           HOST: 'localhost',
           PATH: '/api/v1',
+          RELATIVE_PATH: './api/v1',
           PORT: 3000
         },
         BCRYPT: {
