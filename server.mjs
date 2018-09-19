@@ -28,16 +28,11 @@ mongooseConnection.once('open', () => {
 
 app.listen(env.API.PORT)
 if (env.TYPE === 'development') app.use(cors())
-app.use(
-  bodyParser({
-    detectJSON: function (ctx) {
-      return /\.json$/i.test(ctx.path)
-    }
-  })
-)
+app.use(bodyParser())
 
 app.on('error', (err, ctx) => {
-  if (err.name === 'ValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'MongoError') {
+    ctx.body = err.errors
     ctx.status = 400
     return
   }

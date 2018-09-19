@@ -1,6 +1,6 @@
 export const validateLength = function (min, max) {
   return function (propertyName) {
-    return this[propertyName].length >= min && this[propertyName].length <= max
+    return propertyName.length >= min && propertyName.length <= max
   }
 }
 

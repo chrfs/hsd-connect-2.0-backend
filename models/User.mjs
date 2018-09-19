@@ -53,8 +53,7 @@ UserSchema.path('email').validate(async function (email) {
 }, 'An User with this E-Mail already exists.')
 
 const User = mongoose.model('users', UserSchema)
-
-export const getAllUsers = () => User.find()
+export const findUsers = () => User.find()
 
 export const createUser = async newUser => {
   try {
@@ -72,4 +71,4 @@ export const createUser = async newUser => {
 
 export const updateUser = query => User.update({ _id: query._id }, query)
 
-export const findUser = query => User.find(query)
+export const findUser = query => User.findOne(query)

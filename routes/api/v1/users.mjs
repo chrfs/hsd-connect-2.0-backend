@@ -6,8 +6,13 @@ const router = new Router({
 })
 
 router.get('/', async ctx => {
-  const users = await User.getAllUsers()
+  const users = await User.findUsers()
   ctx.body = { users }
+})
+
+router.get('/:_id', async ctx => {
+  const user = await User.findUser({ _id: ctx.params._id })
+  ctx.body = { user }
 })
 
 router.post('/register', async (ctx, next) => {
@@ -32,7 +37,7 @@ router.post('/auth', async ctx => {
     ctx.status = 400
     return
   }
-  const user = await User.find({ email })
+  const user = await User.findUser({ email })
   console.log(user)
   if (!user) {
     ctx.status = 401
