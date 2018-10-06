@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import * as schemaHelper from '../utils/models/schemaHelper'
+import * as schemaHelper from '../utils/models/schema'
 
 const ProjectSchema = new mongoose.Schema({
   userId: {

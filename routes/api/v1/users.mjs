@@ -1,5 +1,6 @@
 import Router from 'koa-router'
 import * as User from '../../../models/User'
+import * as userHelper from '../../../utils/routes/users'
 
 const router = new Router({
   prefix: '/users'
@@ -25,22 +26,29 @@ router.post('/register', async (ctx, next) => {
     }
     await User.createUser({ email, password })
     ctx.body = 'User has been successfully created.'
+    ctx.status = 201
   } catch (err) {
     throw err
   }
 })
 
-router.post('/auth', async ctx => {
-  const { email, password } = ctx.request.body
-  if (!email || !password) {
-    ctx.body = 'Please enter your email and password to authenticate.'
-    ctx.status = 400
-    return
-  }
-  const user = await User.findUser({ email })
-  console.log(user)
-  if (!user) {
-    ctx.status = 401
+router.post('/login', async ctx => {
+  try {
+    const { email, password } = ctx.request.body
+    if (!email || !password) {
+      ctx.body = 'email and password are required'
+      ctx.status = 406
+      return
+    }
+    const user = await User.findUser({ email })
+    const authStatus = userHelper.checkUserPassword(user, password)
+    if (!authStatus) {
+      ctx.status = 401
+      return
+    }
+    ctx.body = await userHelper.createJWT(user)
+  } catch (err) {
+    throw err
   }
 })
 

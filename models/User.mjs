@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-import * as schemaHelper from '../utils/models/schemaHelper'
-import * as userHelper from '../utils/models/userHelper'
+import * as schemaHelper from '../utils/models/schema'
+import * as userHelper from '../utils/models/user'
 
 const UserSchema = new mongoose.Schema({
   firstname: {
