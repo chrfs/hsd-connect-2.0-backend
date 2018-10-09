@@ -21,6 +21,10 @@ export default (env => {
         MONGO: {
           USERNAME: 'user',
           PASSWORD: 'secret'
+        },
+        WINSTON: {
+          LOG_DIR: 'logs',
+          LOG_LEVEL: 'debug'
         }
       }
     }

@@ -8,14 +8,17 @@
   "dependencies": {
     "@koa/cors": "^2.2.2",
     "bcrypt": "^2.0.1",
-    "install": "^0.12.1",
+    "fs": "0.0.1-security",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.5.3",
     "koa-bodyparser": "^2.5.0",
-    "koa-mount": "^3.0.0",
+    "koa-morgan": "^1.0.1",
     "koa-router": "^7.4.0",
     "mongoose": "^5.2.15",
-    "npm": "^6.4.1"
+    "npm": "^6.4.1",
+    "raven": "^2.6.4",
+    "winston": "^3.1.0",
+    "winston-daily-rotate-file": "^3.3.3"
   },
   "scripts": {
     "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"./**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./server.mjs'",

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
-import * as schemaHelper from '../utils/models/schema'
-import * as userHelper from '../utils/models/user'
+import {schemaUtils, userUtils} from '../utils/models'
 
 const UserSchema = new mongoose.Schema({
   firstname: {
@@ -14,7 +13,7 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     required: [true, 'Bitte verwende Deine gültige HSD E-Mail Adresse.'],
     validate: {
-      validator: userHelper.validateEmail,
+      validator: userUtils.validateEmail,
       message: 'Bitte verwende Deine gültige HSD E-Mail Adresse.'
     }
   },
@@ -22,7 +21,7 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.String,
     required: [true, 'Bitte gebe ein gültiges Passwort ein.'],
     validate: {
-      validator: userHelper.validatePassword,
+      validator: userUtils.validatePassword,
       message:
         'Dein Passwort muss aus einem Klein- & Großbuchstaben, einer Zahl, einem Sonderzeichen (!@#%&) bestehen und zwischen acht bis 32 Zeichen lang sein.'
     }
@@ -45,9 +44,9 @@ const UserSchema = new mongoose.Schema({
   }
 })
 
-UserSchema.pre('save', userHelper.setNameFromEmail)
-UserSchema.pre('save', userHelper.setHashedPassword)
-UserSchema.pre('save', schemaHelper.setDate('updatedAt'))
+UserSchema.pre('save', userUtils.setRecordNameOfEmail)
+UserSchema.pre('save', userUtils.setRecordHashedPassword)
+UserSchema.pre('save', schemaUtils.setRecordDate('updatedAt'))
 UserSchema.path('email').validate(async function (email) {
   return !(await User.find({ email: email })).length
 }, 'An User with this E-Mail already exists.')

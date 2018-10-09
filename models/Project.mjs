@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import * as schemaHelper from '../utils/models/schema'
+import {schemaUtils} from '../utils/models'
 
 const ProjectSchema = new mongoose.Schema({
   userId: {
@@ -12,14 +12,14 @@ const ProjectSchema = new mongoose.Schema({
     unique: true,
     dropDups: true,
     validate: {
-      validator: schemaHelper.validateLength(15, 30),
+      validator: schemaUtils.validateLength(15, 30),
       message: 'The title length has to be between 15 and 30 characters.'
     }
   },
   description: {
     type: mongoose.Schema.Types.Array,
     validate: {
-      validator: schemaHelper.validateLength(200, 1000),
+      validator: schemaUtils.validateLength(200, 1000),
       message:
         'The description length has to be between 200 and 1000 characters.'
     }
@@ -27,7 +27,7 @@ const ProjectSchema = new mongoose.Schema({
   keywords: {
     type: mongoose.Schema.Types.Array
   },
-  isSearchingForParticipants: {
+  searchingForParticipants: {
     type: mongoose.Schema.Types.Boolean,
     default: false
   },
@@ -46,7 +46,7 @@ const ProjectSchema = new mongoose.Schema({
   }
 })
 
-ProjectSchema.pre('save', schemaHelper.setDate('updatedAt'))
+ProjectSchema.pre('save', schemaUtils.setRecordDate('updatedAt'))
 ProjectSchema.path('title').validate(async function (title) {
   return !(await Project.find({ title })).length
 }, 'A Project with this Title already exists.')

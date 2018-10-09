@@ -1,10 +1,41 @@
 import Router from 'koa-router'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import env from '../../../config/env.mjs'
 import * as User from '../../../models/User'
-import * as userHelper from '../../../utils/routes/users'
 
 const router = new Router({
   prefix: '/users'
 })
+
+const checkUserPassword = async function (user, password) {
+  try {
+    const salt = await bcrypt.genSalt(env.BCRYPT.SALT_ROUNDS)
+    const hashedPassword = bcrypt.hashSync(password, salt)
+    return user.password === hashedPassword
+  } catch (err) {
+    throw err
+  }
+}
+
+const createJWT = async function (user) {
+  try {
+    const newJwt = jwt.sign(
+      {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        authorization: user.authorization,
+        settings: user.settings
+      },
+      env.JWT.SECRET,
+      { expiresIn: env.JWT.EXPIRES_IN }
+    )
+    return newJwt
+  } catch (err) {
+    throw err
+  }
+}
 
 router.get('/', async ctx => {
   const users = await User.findUsers()
@@ -41,12 +72,12 @@ router.post('/login', async ctx => {
       return
     }
     const user = await User.findUser({ email })
-    const authStatus = userHelper.checkUserPassword(user, password)
+    const authStatus = checkUserPassword(user, password)
     if (!authStatus) {
       ctx.status = 401
       return
     }
-    ctx.body = await userHelper.createJWT(user)
+    ctx.body = await createJWT(user)
   } catch (err) {
     throw err
   }
