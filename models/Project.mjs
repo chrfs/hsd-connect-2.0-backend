@@ -27,7 +27,7 @@ const ProjectSchema = new mongoose.Schema({
   keywords: {
     type: mongoose.Schema.Types.Array
   },
-  searchingForParticipants: {
+  searching_participants: {
     type: mongoose.Schema.Types.Boolean,
     default: false
   },
@@ -36,17 +36,17 @@ const ProjectSchema = new mongoose.Schema({
     required: true,
     values: ['getting started', 'w.i.p.', 'already finished']
   },
-  createdAt: {
+  created_at: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   },
-  updatedAt: {
+  updated_at: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
 })
 
-ProjectSchema.pre('save', schemaUtils.setRecordDate('updatedAt'))
+ProjectSchema.pre('update', schemaUtils.setRecordDate('updatedAt'))
 ProjectSchema.path('title').validate(async function (title) {
   return !(await Project.find({ title })).length
 }, 'A Project with this Title already exists.')

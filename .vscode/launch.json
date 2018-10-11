@@ -9,7 +9,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/server.mjs",
+      "program": "${workspaceFolder}/app.mjs",
       "runtimeArgs": [
         "--experimental-modules",
         "--harmony-dynamic-import"

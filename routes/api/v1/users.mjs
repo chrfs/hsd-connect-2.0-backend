@@ -10,9 +10,10 @@ const router = new Router({
 
 const checkUserPassword = async function (user, password) {
   try {
-    const salt = await bcrypt.genSalt(env.BCRYPT.SALT_ROUNDS)
-    const hashedPassword = bcrypt.hashSync(password, salt)
-    return user.password === hashedPassword
+    if (!user) {
+      return false
+    }
+    return bcrypt.compare(password, user.password)
   } catch (err) {
     throw err
   }
@@ -47,7 +48,7 @@ router.get('/:_id', async ctx => {
   ctx.body = { user }
 })
 
-router.post('/register', async (ctx, next) => {
+router.post('/', async (ctx, next) => {
   try {
     const { email, password } = ctx.request.body
     if (!email || !password) {
@@ -57,27 +58,26 @@ router.post('/register', async (ctx, next) => {
     }
     await User.createUser({ email, password })
     ctx.body = 'User has been successfully created.'
-    ctx.status = 201
   } catch (err) {
     throw err
   }
 })
 
-router.post('/login', async ctx => {
+router.post('/auth', async ctx => {
   try {
     const { email, password } = ctx.request.body
     if (!email || !password) {
-      ctx.body = 'email and password are required'
-      ctx.status = 406
+      ctx.body = 'Please enter your email and password to authenticate.'
       return
     }
     const user = await User.findUser({ email })
-    const authStatus = checkUserPassword(user, password)
+    const authStatus = await checkUserPassword(user, password)
     if (!authStatus) {
+      ctx.body = 'Authentification failed, please check your credentials'
       ctx.status = 401
       return
     }
-    ctx.body = await createJWT(user)
+    ctx.body = { authToken: await createJWT(user) }
   } catch (err) {
     throw err
   }

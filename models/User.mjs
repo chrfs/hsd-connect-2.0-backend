@@ -11,19 +11,18 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: mongoose.Schema.Types.String,
     unique: true,
-    required: [true, 'Bitte verwende Deine gültige HSD E-Mail Adresse.'],
+    required: [true, 'Please enter your hsd university e-mail address.'],
     validate: {
       validator: userUtils.validateEmail,
-      message: 'Bitte verwende Deine gültige HSD E-Mail Adresse.'
+      message: 'Please use your hsd university e-mail address.'
     }
   },
   password: {
     type: mongoose.Schema.Types.String,
-    required: [true, 'Bitte gebe ein gültiges Passwort ein.'],
+    required: [true, 'Please enter a valid hsd university e-mail address.'],
     validate: {
       validator: userUtils.validatePassword,
-      message:
-        'Dein Passwort muss aus einem Klein- & Großbuchstaben, einer Zahl, einem Sonderzeichen (!@#%&) bestehen und zwischen acht bis 32 Zeichen lang sein.'
+      message: 'Your password has to contain an upper- & lowercase letter, a number, a special character (!@#%&) and have a length between 8 and 32 characters.'
     }
   },
   settings: {
@@ -48,13 +47,13 @@ UserSchema.pre('save', userUtils.setRecordNameOfEmail)
 UserSchema.pre('save', userUtils.setRecordHashedPassword)
 UserSchema.pre('save', schemaUtils.setRecordDate('updatedAt'))
 UserSchema.path('email').validate(async function (email) {
-  return !(await User.find({ email: email })).length
-}, 'An User with this E-Mail already exists.')
+  return !(await User.find({ email })).length
+}, 'An user with this e-mail already exists.')
 
 const User = mongoose.model('users', UserSchema)
 export const findUsers = () => User.find()
 
-export const createUser = async newUser => {
+export const createUser = userProperties => {
   try {
     const predefinedFields = {
       settings: 0,
@@ -62,7 +61,8 @@ export const createUser = async newUser => {
       active: true,
       created_at: Date.now()
     }
-    return new User(Object.assign(newUser, predefinedFields)).save()
+    const newUser = new User({...userProperties, ...predefinedFields})
+    return newUser.save()
   } catch (err) {
     throw err
   }

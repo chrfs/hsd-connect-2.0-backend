@@ -21,9 +21,9 @@
     "winston-daily-rotate-file": "^3.3.3"
   },
   "scripts": {
-    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"./**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./server.mjs'",
+    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"./**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./app.mjs'",
     "prettier": "prettier-standard \"./**/*.mjs\"",
-    "start": "NODE_ENV=production node --experimental-modules --harmony-dynamic-import ./server.mjs"
+    "start": "NODE_ENV=production node --experimental-modules --harmony-dynamic-import ./app.mjs"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.5",

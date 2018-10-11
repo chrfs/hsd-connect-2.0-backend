@@ -4,7 +4,7 @@ import cors from '@koa/cors'
 import mongoose from 'mongoose'
 import env from './config/env'
 import api from './routes'
-import formatter from './utils/formatter'
+import response from './utils/response'
 import logger from './utils/logger'
 
 const app = new Koa()
@@ -35,19 +35,23 @@ app.use(bodyParser())
 
 app.use(async (ctx, next) => {
   try {
-    ctx.state.requestStart = Date.now()
     await next()
-    formatter.formatResponse(ctx)
+    response.send(ctx)
   } catch (err) {
     ctx.status = err.status || 500
-    ctx.body = err.message
     ctx.app.emit('error', err, ctx)
   }
 })
 
 app.on('error', async (err, ctx) => {
   logger.error(err)
-  formatter.formatResponse(ctx, err)
+  if (err.name === 'ValidationError') {
+    const validationErrors = response.formatValidationErrors(err)
+    ctx.status = 400
+    response.send(ctx, validationErrors)
+    return
+  }
+  response.send(ctx, err)
 })
 
 app.use(api.routes())
