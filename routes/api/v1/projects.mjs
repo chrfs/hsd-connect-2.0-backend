@@ -6,8 +6,12 @@ const router = new Router({
 })
 
 router.get('/', async ctx => {
-  const projects = await Project.findProjects()
-  ctx.body = { projects }
+  try {
+    const projects = await Project.findProjects()
+    ctx.body = projects
+  } catch (err) {
+    throw err
+  }
 })
 
 router.get('/:_id', async ctx => {
@@ -15,13 +19,14 @@ router.get('/:_id', async ctx => {
   ctx.body = project
 })
 
-router.post('/', async (ctx, next) => {
+router.post('/', async ctx => {
   try {
-    const newProject = ctx.body.project
+    const newProject = ctx.request.body
     if (!newProject) {
-      ctx.status = 401
+      ctx.status = 400
       return
     }
+    newProject.userId = ctx.state.user._id
     const project = await Project.createProject(newProject)
     ctx.body = project
   } catch (err) {

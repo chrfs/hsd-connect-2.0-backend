@@ -1,45 +1,12 @@
 import Router from 'koa-router'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import env from '../../../config/env.mjs'
 import * as User from '../../../models/User'
 
 const router = new Router({
   prefix: '/users'
 })
 
-const checkUserPassword = async function (user, password) {
-  try {
-    if (!user) {
-      return false
-    }
-    return bcrypt.compare(password, user.password)
-  } catch (err) {
-    throw err
-  }
-}
-
-const createJWT = async function (user) {
-  try {
-    const newJwt = jwt.sign(
-      {
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        authorization: user.authorization,
-        settings: user.settings
-      },
-      env.JWT.SECRET,
-      { expiresIn: env.JWT.EXPIRES_IN }
-    )
-    return newJwt
-  } catch (err) {
-    throw err
-  }
-}
-
 router.get('/', async ctx => {
-  const users = await User.findUsers()
+  const users = await User.findUsers({lean: true}).select('_id firstname lastname email')
   ctx.body = { users }
 })
 
@@ -58,29 +25,6 @@ router.post('/', async (ctx, next) => {
     }
     await User.createUser({ email, password })
     ctx.body = 'User has been successfully created.'
-  } catch (err) {
-    throw err
-  }
-})
-
-router.post('/auth', async ctx => {
-  try {
-    const { email, password } = ctx.request.body
-    if (!email || !password) {
-      ctx.body = 'Please enter your email and password to authenticate.'
-      return
-    }
-    const user = await User.findUser({ email })
-    const authStatus = await checkUserPassword(user, password)
-    if (!authStatus) {
-      ctx.body = 'Authentification failed, please check your credentials'
-      ctx.status = 401
-      return
-    }
-    const userObject = Object.assign({}, user)
-    delete userObject.password
-    delete userObject.created_at
-    ctx.body = { authToken: await createJWT(userObject), userObject }
   } catch (err) {
     throw err
   }

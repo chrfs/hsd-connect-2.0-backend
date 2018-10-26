@@ -42,3 +42,7 @@ The `start`script is dedicated for production purposes and starts the server inc
 
 #### Authentification
 Authentification is based on JsonWebToken´s, therefore every authenticated client stores a authentication token. Every authentifacation required route stands behind an `ensureAuthentification` midleware and checks the authToken reveiced in the Header-information like the following: `Authorizazion: barer <authToken>`.
+
+
+#### Documentation
+For more information about the API visit the documentation: https://documenter.getpostman.com/view/5718203/RzZ1qNRD
