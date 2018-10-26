@@ -1,0 +1,39 @@
+{
+  "name": "hsd_connect_2_0_backend",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "ssh://git@gitlab.chrcode.com:3000/hsd/hsd-connect-2.0/backend.git",
+  "author": "Abdelmoez Cherif <a.cherif@me.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@koa/cors": "^2.2.2",
+    "bcrypt": "^2.0.1",
+    "fs": "0.0.1-security",
+    "jsonwebtoken": "^8.3.0",
+    "koa": "^2.5.3",
+    "koa-bodyparser": "^2.5.0",
+    "koa-morgan": "^1.0.1",
+    "koa-router": "^7.4.0",
+    "mongoose": "^5.2.15",
+    "npm": "^6.4.1",
+    "raven": "^2.6.4",
+    "winston": "^3.1.0",
+    "winston-daily-rotate-file": "^3.3.3"
+  },
+  "scripts": {
+    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard --parser babel-eslint \"./**/*.mjs\" && NODE_ENV=development node --experimental-modules --harmony-dynamic-import ./app.mjs'",
+    "prettier": "prettier-standard \"./**/*.mjs\"",
+    "start": "NODE_ENV=production node --experimental-modules --harmony-dynamic-import ./app.mjs"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.5",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "nodemon": "^1.17.5",
+    "prettier-standard": "^8.0.1",
+    "standard": "^11.0.1"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2018,
+    "ecmaFeatures": {
+      "globalReturn": false,
+      "import/parser": "babel-eslint",
+      "impliedStrict": false,
+      "jsx": false,
+      "experimentalObjectRestSpread": false
+    }
+  },
+  "extends": "airbnb",
+  "globals": {
+    "window": true,
+    "document": true
+  },
+  "rules": {
+    "jsx-a11y/img-has-alt": [0],
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "no-underscore-dangle": "off",
+    "no-irregular-whitespace": "off",
+    "keyword-spacing": "off",
+    "no-shadow": "off",
+    "quotes": ["error", "single"],
+    "indent": 0,
+    "import/extensions": ["off", "always", {
+      ".mjs": "never"
+    }],
+    "switch-colon-spacing": "off",
+    "eol-last": "off",
+    "object-curly-newline": "off",
+    "space-in-parens": ["error", "never"],
+    "object-curly-spacing": ["error", "always", { "objectsInObjects": false }],
+    "space-before-function-paren": ["error", "never"],
+    "semi": ["error", "always"],
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "never",
+        "objects": "never",
+        "imports": "never",
+        "exports": "never",
+        "functions": "ignore"
+      }
+    ],
+    "max-len": [
+      2,
+      {
+        "code": 120,
+        "ignoreComments": true,
+        "ignoreTrailingComments": true,
+        "ignoreStrings": true,
+        "ignoreUrls": true
+      }
+    ]
+  }
+}
