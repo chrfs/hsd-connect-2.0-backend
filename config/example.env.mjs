@@ -6,7 +6,9 @@ export default (env => {
         TYPE: 'development',
         API: {
           VERSION: '1.0.0',
+          HOST: 'localhost',
           PATH: '/api/v1',
+          RELATIVE_PATH: './api/v1',
           PORT: 3000
         },
         BCRYPT: {
@@ -15,6 +17,14 @@ export default (env => {
         JWT: {
           SECRET: 'secret',
           EXPIRES_IN: '1h'
+        },
+        MONGO: {
+          USERNAME: 'user',
+          PASSWORD: 'secret'
+        },
+        WINSTON: {
+          LOG_DIR: 'logs',
+          LOG_LEVEL: 'debug'
         }
       }
     }
@@ -22,9 +32,7 @@ export default (env => {
       return {}
     }
     default: {
-      /* eslint-disable no-console */
-      console.error('Your environment is invalid: ', env)
-      return {}
+      throw new Error('Your NODE_ENV is invalid!')
     }
   }
 })(process.env.NODE_ENV)
