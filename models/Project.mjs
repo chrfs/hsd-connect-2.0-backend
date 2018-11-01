@@ -36,6 +36,14 @@ const ProjectSchema = new mongoose.Schema({
     required: true,
     values: ['getting started', 'w.i.p.', 'already finished']
   },
+  members: {
+    type: mongoose.Schema.Types.Array,
+    default: []
+  },
+  liked_by: {
+    type: mongoose.Schema.Types.Array,
+    default: []
+  },
   created_at: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
@@ -54,6 +62,8 @@ const Project = mongoose.model('projects', ProjectSchema)
 
 export const findProjects = () => Project.find()
 
+export const findProject = query => Project.findOne(query)
+
 export const createProject = async newProject => {
   try {
     return new Project(newProject).save()
@@ -62,5 +72,3 @@ export const createProject = async newProject => {
   }
 }
 export const updateProject = query => Project.update({ _id: query._id }, query)
-
-export const findProject = query => Project.findOne(query)

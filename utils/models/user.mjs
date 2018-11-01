@@ -16,7 +16,7 @@ userUtils.validateEmail = mail => {
 
 userUtils.validatePassword = password => {
   const regExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#%&])(?=.{8,32})/
-  return regExp.test(password) && password.length > 8 && password.length < 32
+  return regExp.test(password) && password.length >= 8 && password.length <= 32
 }
 
 userUtils.setRecordNameOfEmail = function (next) {

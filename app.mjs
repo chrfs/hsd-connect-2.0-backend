@@ -36,12 +36,15 @@ app.use(bodyParser())
 app.use(async (ctx, next) => {
   try {
     await next()
+    console.log('Body:', ctx.body)
     response.send(ctx)
   } catch (err) {
     ctx.status = err.status || 500
     ctx.app.emit('error', err, ctx)
   }
 })
+
+app.use(api.routes())
 
 app.on('error', async (err, ctx) => {
   logger.error(err)
@@ -53,5 +56,3 @@ app.on('error', async (err, ctx) => {
   }
   response.send(ctx, err)
 })
-
-app.use(api.routes())
