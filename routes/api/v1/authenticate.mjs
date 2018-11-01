@@ -56,7 +56,7 @@ router.post('users/auth', async ctx => {
 
 router.use(async (ctx, next) => {
   try {
-    if (ctx.state.isisAuthorizing === true) {
+    if (ctx.state.isAuthorizing === true) {
       return
     }
     const authorization = jwt.verify(
@@ -70,7 +70,7 @@ router.use(async (ctx, next) => {
     ctx.state.user = authorization.user
     await next()
   } catch (err) {
-    next(err)
+    throw err
   }
 })
 
