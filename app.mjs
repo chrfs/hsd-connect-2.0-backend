@@ -36,7 +36,6 @@ app.use(bodyParser())
 app.use(async (ctx, next) => {
   try {
     await next()
-    console.log('Body:', ctx.body)
     response.send(ctx)
   } catch (err) {
     ctx.status = err.status || 500

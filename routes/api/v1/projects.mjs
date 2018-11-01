@@ -1,9 +1,12 @@
 import Router from 'koa-router'
+import { authorizeUser } from './middleware/authorization'
 import * as Project from '../../../models/Project'
 
 const router = new Router({
   prefix: '/projects'
 })
+
+router.use(authorizeUser)
 
 router.get('/', async ctx => {
   try {
