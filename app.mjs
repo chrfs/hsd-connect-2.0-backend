@@ -16,6 +16,7 @@ const mongooseOptions = {
   useNewUrlParser: true
 }
 mongoose.connect(`mongodb://localhost:27017/hsdconnect`, mongooseOptions)
+mongoose.set('useCreateIndex', true)
 const mongooseConnection = mongoose.connection
 mongooseConnection.on('error', err => {
   logger.error(err)
@@ -28,7 +29,6 @@ mongooseConnection.once('open', () => {
     }/`
   )
 })
-
 app.listen(env.API.PORT)
 if (env.TYPE === 'development') app.use(cors())
 app.use(bodyParser())

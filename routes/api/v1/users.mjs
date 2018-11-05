@@ -64,9 +64,9 @@ router.post('/auth', async ctx => {
     }
     user.password = null
     ctx.body = { authToken: await createJWT(user), user }
-    return Promise.resolve();
+    return
   } catch (err) {
-    throw err 
+    throw err
   }
 })
 
