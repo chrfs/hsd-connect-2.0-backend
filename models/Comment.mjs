@@ -1,22 +1,27 @@
 import mongoose from 'mongoose'
-import {schemaUtils} from '../utils/models'
+import schemaUtils from '../utils/models/schemaUtils'
 
-const CommentSchema = new mongoose.Schema({
+const commentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'User'
   },
   postId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'Post'
   },
   content: {
     type: mongoose.Schema.Types.Array,
     validate: {
       validator: schemaUtils.validateLength(20, 300),
-      message:
-        'The content length has to be between 20 and 300 characters.'
+      message: 'The content length has to be between 20 and 300 characters.'
     }
+  },
+  updated_at: {
+    type: mongoose.Schema.Types.Date,
+    default: Date.now()
   },
   created_at: {
     type: mongoose.Schema.Types.Date,
@@ -24,13 +29,10 @@ const CommentSchema = new mongoose.Schema({
   }
 })
 
-CommentSchema.pre('update', schemaUtils.setRecordDate('updatedAt'))
+commentSchema.pre('update', schemaUtils.setRecordDate('updatedAt'))
+const Comment = mongoose.model('Comment', commentSchema)
 
-const Comment = mongoose.model('posts', CommentSchema)
-
-export const findPostComments = (query) => Comment.find(query)
-
-export const findComment = query => Comment.findOne(query)
+export const findComments = query => Comment.find(query)
 
 export const createComment = async newComment => {
   try {

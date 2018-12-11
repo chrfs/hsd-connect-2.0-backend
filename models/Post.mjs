@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import {schemaUtils} from '../utils/models'
+import schemaUtils from '../utils/models/schemaUtils'
 
 const PostSchema = new mongoose.Schema({
   userId: {
@@ -14,8 +14,7 @@ const PostSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Array,
     validate: {
       validator: schemaUtils.validateLength(20, 300),
-      message:
-        'The content length has to be between 20 and 300 characters.'
+      message: 'The content length has to be between 20 and 300 characters.'
     }
   },
   liked_by: {
@@ -38,9 +37,9 @@ const PostSchema = new mongoose.Schema({
 
 PostSchema.pre('update', schemaUtils.setRecordDate('updatedAt'))
 
-const Post = mongoose.model('posts', PostSchema)
+const Post = mongoose.model('Post', PostSchema)
 
-export const findProjectPosts = (query) => Post.find(query)
+export const findProjectPosts = query => Post.find(query)
 
 export const findPost = query => Post.findOne(query)
 

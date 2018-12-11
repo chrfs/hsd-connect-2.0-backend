@@ -1,7 +1,8 @@
 import Koa from 'koa'
-import bodyParser from 'koa-bodyparser'
 import cors from '@koa/cors'
-import mongoose from 'mongoose'
+import convert from 'koa-convert'
+import body from 'koa-better-body'
+import mongo from './mongo'
 import env from './config/env'
 import api from './routes'
 import response from './utils/response'
@@ -9,32 +10,14 @@ import logger from './utils/logger'
 
 const app = new Koa()
 
-const mongooseOptions = {
-  user: env.MONGO.USERNAME,
-  pass: env.MONGO.PASSWORD,
-  auth: { authdb: 'admin' },
-  useNewUrlParser: true
-}
-mongoose.connect(`mongodb://localhost:27017/hsdconnect`, mongooseOptions)
-mongoose.set('useCreateIndex', true)
-const mongooseConnection = mongoose.connection
-mongooseConnection.on('error', err => {
-  logger.error(err)
-})
-mongooseConnection.once('open', () => {
-  logger.info('Connection to database is established')
-  logger.info(
-    `API is up running at http://${env.API.HOST}:${env.API.PORT}${
-      env.API.PATH
-    }/`
-  )
-})
-app.listen(env.API.PORT)
+mongo.connect()
 if (env.TYPE === 'development') app.use(cors())
-app.use(bodyParser())
+app.listen(env.API.PORT)
+app.use(convert(body()))
 
 app.use(async (ctx, next) => {
   try {
+    logger.info(ctx)
     await next()
     response.send(ctx)
   } catch (err) {
@@ -42,8 +25,6 @@ app.use(async (ctx, next) => {
     ctx.app.emit('error', err, ctx)
   }
 })
-
-app.use(api.routes())
 
 app.on('error', async (err, ctx) => {
   logger.error(err)
@@ -55,3 +36,5 @@ app.on('error', async (err, ctx) => {
   }
   response.send(ctx, err)
 })
+
+app.use(api.routes())

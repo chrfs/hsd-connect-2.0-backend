@@ -19,10 +19,7 @@ export const authorizeUser = async (ctx, next) => {
     ctx.state.user = authorization.user
     await next()
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      ctx.status = 401
-      return
-    }
+    ctx.status = 401
     throw err
   }
 }

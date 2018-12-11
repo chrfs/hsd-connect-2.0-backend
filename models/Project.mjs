@@ -1,74 +1,84 @@
 import mongoose from 'mongoose'
-import {schemaUtils} from '../utils/models'
+import { projectValidatorErrors } from '../utils/models/projectUtils'
+import {
+  schemaRecordUtils,
+  schemaValidators,
+  schemaValidatorMessages
+} from '../utils/models/schemaUtils'
 
-const ProjectSchema = new mongoose.Schema({
+const projectSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'users'
   },
   title: {
     type: mongoose.Schema.Types.String,
-    required: [true, 'Please enter a proper title.'],
-    unique: true,
-    dropDups: true,
-    validate: {
-      validator: schemaUtils.validateLength(15, 30),
-      message: 'The title length has to be between 15 and 30 characters.'
-    }
+    required: [true, schemaValidatorMessages.isRequired('title')]
   },
   description: {
-    type: mongoose.Schema.Types.Array,
-    validate: {
-      validator: schemaUtils.validateLength(200, 1000),
-      message:
-        'The description length has to be between 200 and 1000 characters.'
-    }
-  },
-  keywords: {
-    type: mongoose.Schema.Types.Array
-  },
-  searching_participants: {
-    type: mongoose.Schema.Types.Boolean,
-    default: false
-  },
-  status: {
     type: mongoose.Schema.Types.String,
-    required: true,
-    values: ['getting started', 'w.i.p.', 'already finished']
+    required: [true, schemaValidatorMessages.isRequired('description')]
+  },
+  images: {
+    type: [mongoose.Schema.Types.String],
+    default: []
+  },
+  likedBy: {
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+    ref: 'users'
   },
   members: {
-    type: mongoose.Schema.Types.Array,
-    default: []
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+    ref: 'users'
   },
-  liked_by: {
-    type: mongoose.Schema.Types.Array,
-    default: []
+  searchingParticipants: {
+    type: mongoose.Schema.Types.Boolean,
+    default: true
   },
-  created_at: {
+  isActive: {
+    type: mongoose.Schema.Types.Boolean,
+    default: true
+  },
+  createdAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   },
-  updated_at: {
+  updatedAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
 })
+projectSchema.pre('save', schemaValidators.validateLength('title', 20, 35))
+projectSchema.pre('save', schemaValidators.validateLength('description', 300, 1500))
+projectSchema.pre('save', schemaValidators.validateProperty('title', async function (query) {
+  return !(await Project.find(query)).length
+}, projectValidatorErrors.uniqueTitle))
+projectSchema.pre('save', schemaRecordUtils.setPropertyDate('updatedAt'))
 
-ProjectSchema.pre('update', schemaUtils.setRecordDate('updatedAt'))
-ProjectSchema.path('title').validate(async function (title) {
-  return !(await Project.find({ title })).length
-}, 'A Project with this Title already exists.')
-const Project = mongoose.model('projects', ProjectSchema)
+const Project = mongoose.model('projects', projectSchema)
 
-export const findProjects = () => Project.find()
-
-export const findProject = query => Project.findOne(query)
-
-export const createProject = async newProject => {
+Project.createProject = projectProperties => {
   try {
-    return new Project(newProject).save()
+    const {
+      userId,
+      title,
+      description,
+      images,
+      searchingParticipants
+    } = projectProperties
+    return (new Project({
+      userId,
+      title,
+      description,
+      images,
+      searchingParticipants
+    })).save()
   } catch (err) {
     throw err
   }
 }
-export const updateProject = query => Project.update({ _id: query._id }, query)
+
+export default Project

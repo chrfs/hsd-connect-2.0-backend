@@ -24,14 +24,13 @@ router.get('/:_id', async ctx => {
 
 router.post('/', async ctx => {
   try {
-    const newProject = ctx.request.body
+    const newProject = ctx.request.fields
     if (!newProject) {
       ctx.status = 400
       return
     }
     newProject.userId = ctx.state.user._id
-    const project = await Project.createProject(newProject)
-    ctx.body = project
+    ctx.body = await Project.createProject(newProject)
   } catch (err) {
     throw err
   }

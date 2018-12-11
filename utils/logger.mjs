@@ -35,7 +35,10 @@ const winstonConfiguration = {
       )
     }),
     new WinstonDailyRotateFile({
-      filename: path.join(env.WINSTON.LOG_DIR, `/${env.WINSTON.LOG_LEVEL}-%DATE%.log`),
+      filename: path.join(
+        env.WINSTON.LOG_DIR,
+        `/${env.WINSTON.LOG_LEVEL}-%DATE%.log`
+      ),
       ...winstonTransportProperties,
       level: env.WINSTON.LOG_LEVEL
     }),

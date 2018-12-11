@@ -22,11 +22,9 @@ const checkUserPassword = async function (user, password) {
 
 const createJWT = async function (user) {
   try {
-    const newJwt = jwt.sign(
-      { user: user },
-      env.JWT.SECRET,
-      { expiresIn: env.JWT.EXPIRES_IN }
-    )
+    const newJwt = jwt.sign({ user: user }, env.JWT.SECRET, {
+      expiresIn: env.JWT.EXPIRES_IN
+    })
     return newJwt
   } catch (err) {
     throw err
@@ -35,7 +33,7 @@ const createJWT = async function (user) {
 
 router.post('/', async (ctx, next) => {
   try {
-    const { email, password } = ctx.request.body
+    const { email, password } = ctx.request.fields
     if (!email || !password) {
       ctx.body = 'Please enter your email and password to register.'
       ctx.status = 401
@@ -50,12 +48,14 @@ router.post('/', async (ctx, next) => {
 
 router.post('/auth', async ctx => {
   try {
-    const { email, password } = ctx.request.body
+    const { email, password } = ctx.request.fields
     if (!email || !password) {
       ctx.body = 'Please enter your email and password to authenticate.'
       return
     }
-    const user = await User.findUser({ email }).select('_id firstname lastname email password')
+    const user = await User.findUser({ email }).select(
+      '_id firstname lastname email password'
+    )
     const authStatus = await checkUserPassword(user, password)
     if (!authStatus) {
       ctx.body = 'Authentification failed, please check your credentials'
@@ -73,7 +73,9 @@ router.post('/auth', async ctx => {
 router.use(authorizeUser)
 
 router.get('/', async ctx => {
-  const users = await User.findUsers({lean: true}).select('_id firstname lastname email')
+  const users = await User.findUsers({ lean: true }).select(
+    '_id firstname lastname email'
+  )
   ctx.body = { users }
 })
 

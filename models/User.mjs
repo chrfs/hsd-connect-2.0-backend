@@ -1,77 +1,117 @@
 import mongoose from 'mongoose'
-import {schemaUtils, userUtils} from '../utils/models'
+import notificationSchema from './sub/Notification'
+import {
+  schemaValidators,
+  schemaRecordUtils,
+  schemaValidatorMessages
+} from '../utils/models/schemaUtils'
+import { userValidators, userRecordUtils, userValidationErrors } from '../utils/models/userUtils'
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   firstname: {
-    type: mongoose.Schema.Types.String
+    type: mongoose.Schema.Types.String,
+    required: [true, schemaValidatorMessages.isRequired('firstname')]
   },
   lastname: {
-    type: mongoose.Schema.Types.String
+    type: mongoose.Schema.Types.String,
+    required: [true, schemaValidatorMessages.isRequired('lastname')]
   },
   email: {
     type: mongoose.Schema.Types.String,
     unique: true,
-    required: [true, 'Please enter your hsd university e-mail address.'],
-    validate: {
-      validator: userUtils.validateEmail,
-      message: 'Please use your hsd university e-mail address.'
-    }
+    required: [true, schemaValidatorMessages.isRequired('e-mail')]
   },
   password: {
     type: mongoose.Schema.Types.String,
-    required: [true, 'Please enter a valid hsd university e-mail address.'],
-    validate: {
-      validator: userUtils.validatePassword,
-      message: 'Your password has to contain an upper- & lowercase letter, a number, a special character (!@#%&) and have a length between 8 and 32 characters.'
-    }
+    required: [true, schemaValidatorMessages.isRequired('password')]
   },
   settings: {
-    type: mongoose.Schema.Types.Number,
-    default: 0
+    type: mongoose.Schema.Types.Mixed,
+    default: {
+      language: 'de',
+      receiveNotifications: true
+    }
+  },
+  optionalInformation: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {
+      major: '',
+      expectedGraduation: {
+        month: null,
+        year: null
+      }
+    }
+  },
+  bookmarkedProjects: {
+    type: mongoose.Schema.Types.Array,
+    ref: 'projects'
   },
   authorization: {
-    type: mongoose.Schema.Types.Number,
-    default: 0
+    type: mongoose.Schema.Types.Mixed,
+    default: {
+      isUser: true,
+      isModerator: false,
+      isSuperadmin: false
+    }
   },
-  active: {
+  notifications: {
+    type: [notificationSchema],
+    default: []
+  },
+  image: {
+    type: [mongoose.Schema.Types.String],
+    default: []
+  },
+  isActive: {
     type: mongoose.Schema.Types.Boolean,
-    default: true
+    default: false
   },
-  created_at: {
+  verificationCode: {
+    type: mongoose.Schema.Types.String,
+    default: ''
+  },
+  isVerified: {
+    type: mongoose.Schema.Types.Boolean,
+    default: false
+  },
+  createdAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   },
-  updated_at: {
+  updatedAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
 })
 
-UserSchema.pre('save', userUtils.setRecordNameOfEmail)
-UserSchema.pre('save', userUtils.setRecordHashedPassword)
-UserSchema.pre('update', schemaUtils.setRecordDate('updatedAt'))
-UserSchema.path('email').validate(async function (email) {
-  return !(await User.find({ email })).length
-}, 'An user with this e-mail already exists.')
+userSchema.pre('validate', userRecordUtils.setNameOfEmail)
+userSchema.pre('save', userValidators.validateEmail)
+userSchema.pre('save', schemaValidators.validateProperty('email', async function (query) {
+  return !(await User.find(query)).length
+}, userValidationErrors.uniqueEmail))
+userSchema.pre('save', userValidators.validatePassword)
+userSchema.pre('save', userRecordUtils.setHashedPassword)
+userSchema.pre('save', schemaRecordUtils.setPropertyDate('updatedAt'))
 
-const User = mongoose.model('users', UserSchema)
-export const findUsers = () => User.find()
+const User = mongoose.model('User', userSchema)
 
-export const createUser = userProperties => {
+User.createUser = userProperties => {
   try {
-    const predefinedFields = {
-      settings: 0,
-      authorization: 0,
-      active: true,
-      created_at: Date.now()
-    }
-    const newUser = new User({...userProperties, ...predefinedFields})
-    return newUser.save()
+    const { 
+      firstname,
+      lastname,
+      email,
+      password
+    } = userProperties
+    return (new User({
+      firstname,
+      lastname,
+      email,
+      password
+    })).save()
   } catch (err) {
     throw err
   }
 }
 
-export const updateUser = query => User.update({ _id: query._id }, query)
-
-export const findUser = query => User.findOne(query)
+export default User
