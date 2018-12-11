@@ -10,11 +10,11 @@ HSDConnect is a Plattform to find Projects and Collaborations within the HSD Uni
 
 `npm install`
 
-##### Create the environment config `config/env.mjs` and the `docker-compose.dev.yml` 
+##### Create the environment config `config/env.mjs` 
 * Therefore copy the exiting files, remove `example.` of the filename.
-* Customize the configs for your needs, if neccassary.
+* Customize the configs for your needs.
 * Keep in mind to update the example configs, if you decide to add some properties into your config files.
-* Do not push sensitive credentials of any kind into the repo or somewhere else, unless it is production.
+* Do not push sensitive credentials of any kind into the repo(!).
 
 ### Start Server:
 
@@ -27,6 +27,12 @@ HSDConnect is a Plattform to find Projects and Collaborations within the HSD Uni
 `npm run dev`
 
 The `dev`script is only for development purposes and starts a nodemon service along with liting and eslint for all `mjs` files.
+
+##### test
+
+`npm run test`
+
+The `test`script is to start the mocha tests.
 
 ##### prettify
 
