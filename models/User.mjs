@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
-import notificationSchema from './sub/Notification'
+import userNotificationSchema from './sub/UserNotification'
 import {
   schemaValidators,
-  schemaRecordUtils,
+  schemaUtils,
   schemaValidatorMessages
 } from '../utils/models/schemaUtils'
 import { userValidators, userRecordUtils, userValidationErrors } from '../utils/models/userUtils'
@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
     }
   },
   notifications: {
-    type: [notificationSchema],
+    type: [userNotificationSchema],
     default: []
   },
   image: {
@@ -74,11 +74,11 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Boolean,
     default: false
   },
-  createdAt: {
+  updatedAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   },
-  updatedAt: {
+  createdAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
@@ -91,23 +91,15 @@ userSchema.pre('save', schemaValidators.validateProperty('email', async function
 }, userValidationErrors.uniqueEmail))
 userSchema.pre('save', userValidators.validatePassword)
 userSchema.pre('save', userRecordUtils.setHashedPassword)
-userSchema.pre('save', schemaRecordUtils.setPropertyDate('updatedAt'))
+userSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 const User = mongoose.model('User', userSchema)
 
 User.createUser = userProperties => {
   try {
-    const { 
-      firstname,
-      lastname,
-      email,
-      password
-    } = userProperties
     return (new User({
-      firstname,
-      lastname,
-      email,
-      password
+      email: userProperties.email,
+      password: userProperties.password
     })).save()
   } catch (err) {
     throw err

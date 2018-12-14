@@ -27,7 +27,7 @@ export const schemaValidators = {
   },
 }
 
-export const schemaRecordUtils = {
+export const schemaUtils = {
   setPropertyDate: function (propertyName) {
     return function (next) {
       this[propertyName] = Date.now()

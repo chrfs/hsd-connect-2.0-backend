@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { schemaRecordUtils } from '../../utils/models/schemaUtils'
+import { schemaUtils } from '../../utils/models/schemaUtils'
 
 const notificationSchema = new mongoose.Schema({
   type: {
@@ -22,6 +22,6 @@ const notificationSchema = new mongoose.Schema({
   }
 })
 
-notificationSchema.pre('save', schemaRecordUtils.setPropertyDate('updatedAt'))
+notificationSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 export default notificationSchema

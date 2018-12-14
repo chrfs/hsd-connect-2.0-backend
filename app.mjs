@@ -2,7 +2,7 @@ import Koa from 'koa'
 import cors from '@koa/cors'
 import convert from 'koa-convert'
 import body from 'koa-better-body'
-import mongo from './mongo'
+import mongoClient from './mongo'
 import env from './config/env'
 import api from './routes'
 import response from './utils/response'
@@ -10,7 +10,7 @@ import logger from './utils/logger'
 
 const app = new Koa()
 
-mongo.connect()
+mongoClient.connect()
 if (env.TYPE === 'development') app.use(cors())
 app.listen(env.API.PORT)
 app.use(convert(body()))

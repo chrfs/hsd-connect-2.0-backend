@@ -1,21 +1,21 @@
 import { strict as assert} from 'assert'
-import mongo from '../../mongo'
+import mongoClient from '../../mongo'
 import User from './../../models/User'
 import { userValidationErrors } from '../../utils/models/userUtils'
 import { createString } from '../../utils/test'
 
-const getUserProperties = () => {
+const newUserProperties = () => {
   return {
     email: `${createString(5)}.${createString(5)}@study.hs-duesseldorf.de`,
     password: '/38uwZ3z!Ue'
   }
 }
 
-const createNewUser = (userProperties = getUserProperties()) => User.createUser(userProperties)
+const createNewUser = (userProperties = newUserProperties()) => User.createUser(userProperties)
 
-before(async () => mongo.connect())
+before(async () => mongoClient.connect())
 afterEach(async () => User.deleteMany())
-after(async () => mongo.disconnect())
+after(async () => mongoClient.disconnect())
 
 describe('User', function () {
   it('should save a new record', async () => {
@@ -35,11 +35,11 @@ describe('User', function () {
   })
 
   it('should throw an invalid email ValidationError', async () => {
-    await assert.rejects(createNewUser({...getUserProperties(), email: 'not.valid@hs-duesseldorf.com'}), userValidationErrors.invalidEmail)
+    await assert.rejects(createNewUser({...newUserProperties(), email: 'not.valid@hs-duesseldorf.com'}), userValidationErrors.invalidEmail)
   })
 
   it('should throw a duplicate email ValidationError', async () => {
     const newUser = await createNewUser()
-    await assert.rejects(createNewUser({...getUserProperties(), email: newUser.email}), userValidationErrors.uniqueEmail)
+    await assert.rejects(createNewUser({...newUserProperties(), email: newUser.email}), userValidationErrors.uniqueEmail)
   })
 })

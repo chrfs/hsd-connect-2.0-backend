@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import { projectValidatorErrors } from '../utils/models/projectUtils'
+import projectFeedbackSchema from './ProjectFeedback'
 import {
-  schemaRecordUtils,
+  schemaUtils,
   schemaValidators,
   schemaValidatorMessages
 } from '../utils/models/schemaUtils'
@@ -42,11 +43,11 @@ const projectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Boolean,
     default: true
   },
-  createdAt: {
+  updatedAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   },
-  updatedAt: {
+  createdAt: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
@@ -56,25 +57,18 @@ projectSchema.pre('save', schemaValidators.validateLength('description', 300, 15
 projectSchema.pre('save', schemaValidators.validateProperty('title', async function (query) {
   return !(await Project.find(query)).length
 }, projectValidatorErrors.uniqueTitle))
-projectSchema.pre('save', schemaRecordUtils.setPropertyDate('updatedAt'))
+projectSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 const Project = mongoose.model('projects', projectSchema)
 
 Project.createProject = projectProperties => {
   try {
-    const {
-      userId,
-      title,
-      description,
-      images,
-      searchingParticipants
-    } = projectProperties
     return (new Project({
-      userId,
-      title,
-      description,
-      images,
-      searchingParticipants
+      userId: projectProperties.userId,
+      title: projectProperties.title,
+      description: projectProperties.description,
+      images: projectProperties.images,
+      searchingParticipants: projectProperties.searchingParticipants
     })).save()
   } catch (err) {
     throw err
