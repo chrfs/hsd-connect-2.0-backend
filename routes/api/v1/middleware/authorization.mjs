@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import env from '../../../../config/env'
 
-export const authorizeUser = async (ctx, next) => {
+export default async (ctx, next) => {
   try {
     const authToken = ctx.request.header.authorization
     if (!authToken) {

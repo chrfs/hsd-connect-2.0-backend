@@ -1,5 +1,9 @@
 import mongoose from 'mongoose'
-import { schemaUtils, schemaValidators, schemaValidatorMessages } from '../../utils/models/schemaUtils'
+import {
+  schemaUtils,
+  schemaValidators,
+  schemaValidatorMessages
+} from '../../utils/models/schemaUtils'
 
 const projectGroupMessageSchema = new mongoose.Schema({
   userId: {
@@ -9,7 +13,7 @@ const projectGroupMessageSchema = new mongoose.Schema({
   },
   content: {
     type: mongoose.Schema.Types.String,
-    required: [true,  schemaValidatorMessages.isRequired('message content')]
+    required: [true, schemaValidatorMessages.isRequired('message content')]
   },
   updatedAt: {
     type: mongoose.Schema.Types.Date,
@@ -21,7 +25,10 @@ const projectGroupMessageSchema = new mongoose.Schema({
   }
 })
 
-projectGroupMessageSchema.pre('save', schemaValidators.validateLength('content', 2, 300))
+projectGroupMessageSchema.pre(
+  'save',
+  schemaValidators.validateLength('content', 2, 300)
+)
 projectGroupMessageSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 export default projectGroupMessageSchema

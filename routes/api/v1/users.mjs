@@ -1,15 +1,15 @@
-import Router from 'koa-router'
+import KoaRouter from 'koa-router'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import env from '../../../config/env'
-import { authorizeUser } from './middleware/authorization'
-import * as User from '../../../models/User'
+import authorization from './middleware/authorization'
+import User from '../../../models/User'
 
-const router = new Router({
+const router = new KoaRouter({
   prefix: '/users'
 })
 
-const checkUserPassword = async function (user, password) {
+const authenticateUser = function (password, user) {
   try {
     if (!user) {
       return false
@@ -22,16 +22,16 @@ const checkUserPassword = async function (user, password) {
 
 const createJWT = async function (user) {
   try {
-    const newJwt = jwt.sign({ user: user }, env.JWT.SECRET, {
+    const newJWT = jwt.sign({ user: user }, env.JWT.SECRET, {
       expiresIn: env.JWT.EXPIRES_IN
     })
-    return newJwt
+    return newJWT
   } catch (err) {
     throw err
   }
 }
 
-router.post('/', async (ctx, next) => {
+router.post('/', async (ctx) => {
   try {
     const { email, password } = ctx.request.fields
     if (!email || !password) {
@@ -53,34 +53,34 @@ router.post('/auth', async ctx => {
       ctx.body = 'Please enter your email and password to authenticate.'
       return
     }
-    const user = await User.findUser({ email }).select(
+    const user = await User.findOne({ email }).select(
       '_id firstname lastname email password'
     )
-    const authStatus = await checkUserPassword(user, password)
+    const authStatus = await authenticateUser(password, user)
     if (!authStatus) {
       ctx.body = 'Authentification failed, please check your credentials'
       ctx.status = 401
       return
     }
-    user.password = null
-    ctx.body = { authToken: await createJWT(user), user }
+    const {password: removed, ...userRest} = user.toObject()
+    ctx.body = { authToken: await createJWT(userRest), user: userRest }
     return
   } catch (err) {
     throw err
   }
 })
 
-router.use(authorizeUser)
+router.use(authorization)
 
 router.get('/', async ctx => {
-  const users = await User.findUsers({ lean: true }).select(
+  const users = await User.find({ lean: true }).select(
     '_id firstname lastname email'
   )
   ctx.body = { users }
 })
 
 router.get('/:_id', async ctx => {
-  const user = await User.findUser({ _id: ctx.params._id })
+  const user = await User.find({ _id: ctx.params._id })
   ctx.body = { user }
 })
 

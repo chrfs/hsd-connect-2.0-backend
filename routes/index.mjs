@@ -1,7 +1,8 @@
-import Router from 'koa-router'
+import KoaRouter from 'koa-router'
 import env from '../config/env'
+import apiv1 from './api/v1'
 
-const router = new Router({
+const router = new KoaRouter({
   prefix: env.API.PATH
 })
 
@@ -9,9 +10,6 @@ router.get('/', async ctx => {
   ctx.status = 200
 })
 
-// const loadAPI = async apiPath => {
-//   router.use((await import(apiPath)).default.routes())
-// }
-// loadAPI(env.API.RELATIVE_PATH)
+router.use(apiv1.routes())
 
 export default router

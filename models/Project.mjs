@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import { projectValidatorErrors } from '../utils/models/projectUtils'
-import projectFeedbackSchema from './ProjectFeedback'
 import {
   schemaUtils,
   schemaValidators,
@@ -53,23 +52,35 @@ const projectSchema = new mongoose.Schema({
   }
 })
 projectSchema.pre('save', schemaValidators.validateLength('title', 20, 35))
-projectSchema.pre('save', schemaValidators.validateLength('description', 300, 1500))
-projectSchema.pre('save', schemaValidators.validateProperty('title', async function (query) {
-  return !(await Project.find(query)).length
-}, projectValidatorErrors.uniqueTitle))
+projectSchema.pre(
+  'save',
+  schemaValidators.validateLength('description', 300, 1500)
+)
+projectSchema.pre(
+  'save',
+  schemaValidators.validateProperty(
+    'title',
+    async function (query) {
+      try {
+        return !(await Project.find({query})).length
+      } catch (err) { throw err }
+    },
+    projectValidatorErrors.uniqueTitle
+  )
+)
 projectSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 const Project = mongoose.model('projects', projectSchema)
 
 Project.createProject = projectProperties => {
   try {
-    return (new Project({
+    return new Project({
       userId: projectProperties.userId,
       title: projectProperties.title,
       description: projectProperties.description,
       images: projectProperties.images,
       searchingParticipants: projectProperties.searchingParticipants
-    })).save()
+    }).save()
   } catch (err) {
     throw err
   }

@@ -11,7 +11,7 @@ const newUserProperties = () => {
   }
 }
 
-const createNewUser = (userProperties = newUserProperties()) => User.createUser(userProperties)
+const createUser = (userProperties = newUserProperties()) => User.createUser(userProperties)
 
 before(async () => mongoClient.connect())
 afterEach(async () => User.deleteMany())
@@ -19,27 +19,27 @@ after(async () => mongoClient.disconnect())
 
 describe('User', function () {
   it('should save a new record', async () => {
-    assert.equal((await createNewUser()).isNew, false)
+    assert.equal((await createUser()).isNew, false)
   })
 
   it('should update a record property', async () =>  {
-    const newUser = await createNewUser()
+    const newUser = await createUser()
     newUser.isVerified = true
     assert.equal((await newUser.save()).isVerified, true)
   })
 
   it('should throw an invalid password ValidationError', async () => {
-    const newUser = await createNewUser()
+    const newUser = await createUser()
     newUser.password = '38uwZ3zUe'
     await assert.rejects(newUser.save(), userValidationErrors.invalidPassword)
   })
 
   it('should throw an invalid email ValidationError', async () => {
-    await assert.rejects(createNewUser({...newUserProperties(), email: 'not.valid@hs-duesseldorf.com'}), userValidationErrors.invalidEmail)
+    await assert.rejects(createUser({...newUserProperties(), email: 'not.valid@hs-duesseldorf.com'}), userValidationErrors.invalidEmail)
   })
 
   it('should throw a duplicate email ValidationError', async () => {
-    const newUser = await createNewUser()
-    await assert.rejects(createNewUser({...newUserProperties(), email: newUser.email}), userValidationErrors.uniqueEmail)
+    const newUser = await createUser()
+    await assert.rejects(createUser({...newUserProperties(), email: newUser.email}), userValidationErrors.uniqueEmail)
   })
 })

@@ -1,16 +1,13 @@
-import Router from 'koa-router'
-import { authorizeUser } from './middleware/authorization'
-import * as Project from '../../../models/Project'
+import KoaRouter from 'koa-router'
+import Project from '../../../models/Project'
 
-const router = new Router({
+const router = new KoaRouter({
   prefix: '/projects'
 })
 
-router.use(authorizeUser)
-
 router.get('/', async ctx => {
   try {
-    const projects = await Project.findProjects()
+    const projects = await Project.find()
     ctx.body = projects
   } catch (err) {
     throw err
@@ -18,7 +15,7 @@ router.get('/', async ctx => {
 })
 
 router.get('/:_id', async ctx => {
-  const project = await Project.findProject({ _id: ctx.params._id })
+  const project = await Project.find({ _id: ctx.params._id })
   ctx.body = project
 })
 

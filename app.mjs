@@ -5,7 +5,7 @@ import body from 'koa-better-body'
 import mongoClient from './mongo'
 import env from './config/env'
 import api from './routes'
-import response from './utils/response'
+import responseFormatter from './utils/responseFormatter'
 import logger from './utils/logger'
 
 const app = new Koa()
@@ -17,9 +17,8 @@ app.use(convert(body()))
 
 app.use(async (ctx, next) => {
   try {
-    logger.info(ctx)
     await next()
-    response.send(ctx)
+    responseFormatter.send(ctx)
   } catch (err) {
     ctx.status = err.status || 500
     ctx.app.emit('error', err, ctx)
@@ -29,12 +28,12 @@ app.use(async (ctx, next) => {
 app.on('error', async (err, ctx) => {
   logger.error(err)
   if (err.name === 'ValidationError') {
-    const validationErrors = response.formatValidationErrors(err)
+    const validationErrors = responseFormatter.formatValidationErrors(err)
     ctx.status = 400
-    response.send(ctx, validationErrors)
+    responseFormatter.send(ctx, validationErrors)
     return
   }
-  response.send(ctx, err)
+  responseFormatter.send(ctx, err)
 })
 
 app.use(api.routes())

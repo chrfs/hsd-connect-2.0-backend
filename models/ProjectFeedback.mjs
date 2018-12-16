@@ -1,8 +1,12 @@
 import mongoose from 'mongoose'
-import { schemaUtils, schemaValidators, schemaValidatorMessages } from '../utils/models/schemaUtils'
+import {
+  schemaUtils,
+  schemaValidators,
+  schemaValidatorMessages
+} from '../utils/models/schemaUtils'
 import projectFeedbackCommentSchema from './sub/ProjectFeedbackComment'
 
-const projectFeedbackSchema  = new mongoose.Schema({
+const projectFeedbackSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -20,7 +24,7 @@ const projectFeedbackSchema  = new mongoose.Schema({
   },
   content: {
     type: mongoose.Schema.Types.String,
-    required: [true,  schemaValidatorMessages.isRequired('feedback content')]
+    required: [true, schemaValidatorMessages.isRequired('feedback content')]
   },
   comments: {
     type: [projectFeedbackCommentSchema],
@@ -36,9 +40,15 @@ const projectFeedbackSchema  = new mongoose.Schema({
   }
 })
 
-projectFeedbackSchema.pre('save', schemaValidators.validateLength('content', 5, 300))
+projectFeedbackSchema.pre(
+  'save',
+  schemaValidators.validateLength('content', 5, 300)
+)
 projectFeedbackSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
-const ProjectFeedback = mongoose.model('projectFeedbacks', projectFeedbackSchema)
+const ProjectFeedback = mongoose.model(
+  'projectFeedbacks',
+  projectFeedbackSchema
+)
 
 export default ProjectFeedback

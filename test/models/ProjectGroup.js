@@ -14,7 +14,7 @@ const newProjectGroupProperties = () => {
   }
 }
 
-export const createNewProjectGroup = (projectGroupProperties = newProjectGroupProperties()) => {
+export const createProjectGroup = (projectGroupProperties = newProjectGroupProperties()) => {
   return (new ProjectGroup(projectGroupProperties)).save()
 }
 
@@ -31,16 +31,16 @@ after(async () => mongoClient.disconnect())
 
 describe('ProjectGroup', function () {
   it('should save a new record', async () => {
-    assert(await createNewProjectGroup())
+    assert(await createProjectGroup())
   })
 
   describe('ProjectGroupMessage', function () {
     it('should save a new record', async () => {
-      assert(await createNewProjectGroup({ ...newProjectGroupProperties(), messages: [newProjectGroupMessageProperties()]}))
+      assert(await createProjectGroup({ ...newProjectGroupProperties(), messages: [newProjectGroupMessageProperties()]}))
     })
     
     it('should throw a type ValidationError', async () => {
-      await assert.rejects(createNewProjectGroup({ ...newProjectGroupProperties(), messages: ''}))
+      await assert.rejects(createProjectGroup({ ...newProjectGroupProperties(), messages: ''}))
     })
   })
 })

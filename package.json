@@ -13,6 +13,7 @@
     "@koa/cors": "^2.2.2",
     "bcrypt": "^2.0.1",
     "esm": "^3.0.84",
+    "flatted": "^2.0.0",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.5.3",
@@ -26,13 +27,12 @@
     "winston-daily-rotate-file": "^3.3.3"
   },
   "scripts": {
-    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard \"./**/*.mjs\" \"!./test/\" && NODE_ENV=development node -r esm ./index.js'",
+    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard \"./**/*.mjs\" \"!./test/\" && NODE_ENV=development node -r esm ./app.mjs'",
     "prettier": "prettier-standard \"./**/*.mjs\"",
     "start": "NODE_ENV=production node -r @std/esm ./app.mjs",
     "test": "NODE_ENV=test mocha -r esm ./test/**/*.js"
   },
   "devDependencies": {
-    "karma": "^3.1.3",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
     "prettier-standard": "^8.0.1",

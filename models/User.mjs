@@ -5,7 +5,11 @@ import {
   schemaUtils,
   schemaValidatorMessages
 } from '../utils/models/schemaUtils'
-import { userValidators, userRecordUtils, userValidationErrors } from '../utils/models/userUtils'
+import {
+  userValidators,
+  userRecordUtils,
+  userValidationErrors
+} from '../utils/models/userUtils'
 
 const userSchema = new mongoose.Schema({
   firstname: {
@@ -86,9 +90,16 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('validate', userRecordUtils.setNameOfEmail)
 userSchema.pre('save', userValidators.validateEmail)
-userSchema.pre('save', schemaValidators.validateProperty('email', async function (query) {
-  return !(await User.find(query)).length
-}, userValidationErrors.uniqueEmail))
+userSchema.pre(
+  'save',
+  schemaValidators.validateProperty(
+    'email',
+    async function (query) {
+      return !(await User.find(query)).length
+    },
+    userValidationErrors.uniqueEmail
+  )
+)
 userSchema.pre('save', userValidators.validatePassword)
 userSchema.pre('save', userRecordUtils.setHashedPassword)
 userSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
@@ -97,10 +108,10 @@ const User = mongoose.model('User', userSchema)
 
 User.createUser = userProperties => {
   try {
-    return (new User({
+    return new User({
       email: userProperties.email,
       password: userProperties.password
-    })).save()
+    }).save()
   } catch (err) {
     throw err
   }

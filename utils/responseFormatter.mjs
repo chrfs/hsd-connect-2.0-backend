@@ -1,8 +1,8 @@
 import env from '../config/env'
 
-const response = {}
+const responseFormatter = {}
 
-response.send = (ctx, err) => {
+responseFormatter.send = (ctx, err) => {
   try {
     ctx.body = {
       version: env.API.VERSION,
@@ -16,7 +16,7 @@ response.send = (ctx, err) => {
   }
 }
 
-response.formatValidationErrors = validationErrors => {
+responseFormatter.formatValidationErrors = validationErrors => {
   const formattedResponse = Object.keys(validationErrors.errors).reduce(
     (errorsAcc, field) => {
       errorsAcc[field] = validationErrors.errors[field].message
@@ -27,4 +27,4 @@ response.formatValidationErrors = validationErrors => {
   return formattedResponse
 }
 
-export default response
+export default responseFormatter

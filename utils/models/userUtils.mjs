@@ -38,7 +38,7 @@ export const userValidators = {
 export const userRecordUtils = {
   setNameOfEmail (next) {
     if (!this.isNew && !this.isModified('email')) return next()
-    if(!this.email) {
+    if (!this.email) {
       throw userValidationErrors.invalidEmail
     }
     const emailPrefix = this.email.substring(0, this.email.indexOf('@'))

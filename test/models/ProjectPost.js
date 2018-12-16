@@ -2,7 +2,7 @@ import { strict as assert} from 'assert'
 import mongoose from 'mongoose';
 import mongoClient from '../../mongo'
 import { createString } from '../../utils/test'
-import Project from '../../models/ProjectPost'
+import Project from '../../models/Project'
 
 const newProjectProperties = () => {
   return {
@@ -22,7 +22,7 @@ const newProjectProperties = () => {
   }
 }
 
-const createNewProject = (projectProperties = newProjectProperties()) => {
+const createProject = (projectProperties = newProjectProperties()) => {
   return (new Project(projectProperties)).save()
 }
 
@@ -32,27 +32,27 @@ after(async () => mongoClient.disconnect())
 
 describe('Project', function () {
   it('should save a new record', async () => {
-    assert.equal((await createNewProject()).isNew, false)
+    assert.equal((await createProject()).isNew, false)
   })
 
   it('should update a record property', async () =>  {
-    const newProject = await createNewProject()
+    const newProject = await createProject()
     newProject.searchingParticipants = false
     assert.equal((await newProject.save()).searchingParticipants, false)
   })
 
   it('should throw an invalid title ValidationError', async () => {
-    const newProject = await createNewProject()
+    const newProject = await createProject()
     newProject.title = 'to short'
     await assert.rejects(newProject.save())
   })
 
   it('should throw an invalid description ValidationError', async () => {
-    await assert.rejects(createNewProject({...newProjectProperties(), description: 'to short'}))
+    await assert.rejects(createProject({...newProjectProperties(), description: 'to short'}))
   })
 
   it('should throw a duplicate title ValidationError', async () => {
-    const newProject = await createNewProject()
-    await assert.rejects(createNewProject({...newProjectProperties(), title: newProject.title}))
+    const newProject = await createProject()
+    await assert.rejects(createProject({...newProjectProperties(), title: newProject.title}))
   })
 })
