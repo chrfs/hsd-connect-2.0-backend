@@ -21,8 +21,9 @@ const projectSchema = new mongoose.Schema({
     required: [true, schemaValidatorMessages.isRequired('description')]
   },
   images: {
-    type: [mongoose.Schema.Types.String],
-    default: []
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+    ref: 'images'
   },
   likedBy: {
     type: [mongoose.Schema.Types.ObjectId],
@@ -51,7 +52,7 @@ const projectSchema = new mongoose.Schema({
     default: Date.now()
   }
 })
-projectSchema.pre('save', schemaValidators.validateLength('title', 20, 35))
+projectSchema.pre('save', schemaValidators.validateLength('title', 25, 65))
 projectSchema.pre(
   'save',
   schemaValidators.validateLength('description', 300, 1500)
@@ -84,6 +85,14 @@ Project.createProject = projectProperties => {
   } catch (err) {
     throw err
   }
+}
+
+Project.findAndPopulate = (query = {}) => {
+  return Project.find(query).populate({
+    path: 'images',
+    model: 'images',
+    select: 'token -_id'
+  })
 }
 
 export default Project

@@ -1,5 +1,6 @@
 import winston from 'winston'
 import WinstonDailyRotateFile from 'winston-daily-rotate-file'
+import flatted from 'flatted'
 import fs from 'fs'
 import path from 'path'
 import env from '../config/env'
@@ -18,11 +19,15 @@ const winstonTransportProperties = {
 
 const winstonConfiguration = {
   level: env.WINSTON.LOG_LEVEL || 'development',
+  formatter: flatted.stringify,
   format: winston.format.combine(
     winston.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss'
     }),
-    winston.format.json()
+    winston.format.json(),
+    winston.format.printf(
+      info => `${info.timestamp} ${info.level}: ${flatted.stringify(info.message)}`
+    )
   ),
   transports: [
     new winston.transports.Console({

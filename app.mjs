@@ -13,11 +13,12 @@ const app = new Koa()
 mongoClient.connect()
 if (env.TYPE === 'development') app.use(cors())
 app.listen(env.API.PORT)
-app.use(convert(body()))
+app.use(convert(body({ jsonStrict: true, jsonLimit: '4mb' })))
 
 app.use(async (ctx, next) => {
   try {
     await next()
+    if (ctx.state.formatResponse === false) return
     responseFormatter.send(ctx)
   } catch (err) {
     ctx.status = err.status || 500
