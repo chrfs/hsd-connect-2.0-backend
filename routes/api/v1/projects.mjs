@@ -30,7 +30,7 @@ router.post('/', async ctx => {
     const {images, ...newProject} = ctx.request.fields
     const imagesPathArr = await fileUtils.save.images(images)
     newProject.images = imagesPathArr
-    newProject.userId = ctx.state.user._id
+    newProject.user = ctx.state.user._id
     ctx.body = await Project.createProject(newProject)
   } catch (err) {
     throw err

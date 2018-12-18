@@ -10,7 +10,7 @@ const router = new KoaRouter({
 router.get('/:token', async ctx => {
   try {
     const img = await Image.findOne({token: ctx.params.token})
-    if (!fs.existsSync(img)) return
+    if (!fs.existsSync(img.path)) return
     ctx.body = fs.readFileSync(img.path)
     ctx.set('Content-Type', fileType(ctx.body).mime)
     ctx.state.formatResponse = false

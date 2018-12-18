@@ -6,10 +6,10 @@ import {
 } from '../../utils/models/schemaUtils'
 
 const projectFeedbackCommentSchema = new mongoose.Schema({
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'users'
+    ref: 'Users'
   },
   content: {
     type: mongoose.Schema.Types.String,

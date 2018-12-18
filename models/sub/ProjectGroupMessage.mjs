@@ -6,9 +6,9 @@ import {
 } from '../../utils/models/schemaUtils'
 
 const projectGroupMessageSchema = new mongoose.Schema({
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users',
+    ref: 'Users',
     required: true
   },
   content: {

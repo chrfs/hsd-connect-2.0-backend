@@ -6,8 +6,8 @@ import ProjectFeedback from '../../models/ProjectFeedback'
 
 const newProjectFeedbackProperties = () => {
   return {
-    userId: new mongoose.Types.ObjectId(),
-    projectId: new mongoose.Types.ObjectId(),
+    user: new mongoose.Types.ObjectId(),
+    project: new mongoose.Types.ObjectId(),
     likedBy: [
       new mongoose.Types.ObjectId(),
       new mongoose.Types.ObjectId()
@@ -22,7 +22,7 @@ export const createProjectFeedback = (projectFeedbackProperties = newProjectFeed
 
 const newProjectFeedbackCommentProperties = () => {
   return {
-    userId: new mongoose.Types.ObjectId(),
+    user: new mongoose.Types.ObjectId(),
     content: createString(30)
   }
 }

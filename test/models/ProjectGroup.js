@@ -6,7 +6,7 @@ import ProjectGroup from '../../models/ProjectGroup'
 
 const newProjectGroupProperties = () => {
   return {
-    projectId: new mongoose.Types.ObjectId(),
+    project: new mongoose.Types.ObjectId(),
     members: [
       new mongoose.Types.ObjectId(),
       new mongoose.Types.ObjectId()
@@ -20,7 +20,7 @@ export const createProjectGroup = (projectGroupProperties = newProjectGroupPrope
 
 const newProjectGroupMessageProperties = () => {
   return {
-    userId: new mongoose.Types.ObjectId(),
+    user: new mongoose.Types.ObjectId(),
     content: createString(30)
   }
 }

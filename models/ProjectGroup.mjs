@@ -3,14 +3,14 @@ import { schemaUtils } from '../utils/models/schemaUtils'
 import projectGroupMessageSchema from './sub/ProjectGroupMessage'
 
 const projectGroupSchema = new mongoose.Schema({
-  projectId: {
+  project: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'projects',
+    ref: 'Projects',
     required: true
   },
   members: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'users',
+    ref: 'Users',
     required: true,
     default: []
   },
@@ -30,6 +30,6 @@ const projectGroupSchema = new mongoose.Schema({
 
 projectGroupSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
-const ProjectGroup = mongoose.model('projectGroups', projectGroupSchema)
+const ProjectGroup = mongoose.model('ProjectGroup', projectGroupSchema)
 
 export default ProjectGroup

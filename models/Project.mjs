@@ -7,10 +7,10 @@ import {
 } from '../utils/models/schemaUtils'
 
 const projectSchema = new mongoose.Schema({
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'users'
+    ref: 'Users'
   },
   title: {
     type: mongoose.Schema.Types.String,
@@ -23,17 +23,17 @@ const projectSchema = new mongoose.Schema({
   images: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],
-    ref: 'images'
+    ref: 'Images'
   },
   likedBy: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],
-    ref: 'users'
+    ref: 'Users'
   },
   members: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],
-    ref: 'users'
+    ref: 'Users'
   },
   searchingParticipants: {
     type: mongoose.Schema.Types.Boolean,
@@ -62,21 +62,19 @@ projectSchema.pre(
   schemaValidators.validateProperty(
     'title',
     async function (query) {
-      try {
-        return !(await Project.find({query})).length
-      } catch (err) { throw err }
+      return !(await Project.find(query)).length
     },
     projectValidatorErrors.uniqueTitle
   )
 )
 projectSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
-const Project = mongoose.model('projects', projectSchema)
+const Project = mongoose.model('Project', projectSchema)
 
 Project.createProject = projectProperties => {
   try {
     return new Project({
-      userId: projectProperties.userId,
+      user: projectProperties.user,
       title: projectProperties.title,
       description: projectProperties.description,
       images: projectProperties.images,
@@ -89,8 +87,12 @@ Project.createProject = projectProperties => {
 
 Project.findAndPopulate = (query = {}) => {
   return Project.find(query).populate({
+    path: 'user',
+    model: 'User',
+    select: 'firstname lastname fullname'
+  }).populate({
     path: 'images',
-    model: 'images',
+    model: 'Image',
     select: 'token -_id'
   })
 }

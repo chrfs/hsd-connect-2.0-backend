@@ -6,8 +6,8 @@ import Project from '../../models/Project'
 
 const newProjectProperties = () => {
   return {
-    userId: new mongoose.Types.ObjectId(),
-    title: createString(30),
+    user: new mongoose.Types.ObjectId(),
+    title: createString(35),
     description: createString(500),
     likedBy: [
       new mongoose.Types.ObjectId(),

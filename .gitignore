@@ -2,6 +2,7 @@
 node_modules
 /dist
 /logs
+/media
 
 # local env files
 env.mjs

@@ -7,20 +7,20 @@ import {
 import projectFeedbackCommentSchema from './sub/ProjectFeedbackComment'
 
 const projectFeedbackSchema = new mongoose.Schema({
-  projectId: {
+  project: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'projects'
+    ref: 'Projects'
   },
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'users'
+    ref: 'Users'
   },
   likedBy: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],
-    ref: 'users'
+    ref: 'Users'
   },
   content: {
     type: mongoose.Schema.Types.String,
@@ -47,7 +47,7 @@ projectFeedbackSchema.pre(
 projectFeedbackSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 const ProjectFeedback = mongoose.model(
-  'projectFeedbacks',
+  'ProjectFeedback',
   projectFeedbackSchema
 )
 
