@@ -26,11 +26,11 @@ const projectFeedbackCommentSchema = new mongoose.Schema({
 })
 
 projectFeedbackCommentSchema.pre(
-  'save',
+  'validate',
   schemaValidators.validateLength('content', 5, 300)
 )
 projectFeedbackCommentSchema.pre(
-  'save',
+  'validate',
   schemaUtils.setPropertyDate('updatedAt')
 )
 

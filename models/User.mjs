@@ -92,9 +92,9 @@ const userSchema = new mongoose.Schema({
 })
 userSchema.virtual('fullname').get(function () { return this.firstname + ' ' + this.lastname })
 userSchema.pre('validate', userRecordUtils.setNameOfEmail)
-userSchema.pre('save', userValidators.validateEmail)
+userSchema.pre('validate', userValidators.validateEmail)
 userSchema.pre(
-  'save',
+  'validate',
   schemaValidators.validateProperty(
     'email',
     async function (query) {
@@ -103,9 +103,9 @@ userSchema.pre(
     userValidationErrors.uniqueEmail
   )
 )
-userSchema.pre('save', userValidators.validatePassword)
-userSchema.pre('save', userRecordUtils.setHashedPassword)
-userSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
+userSchema.pre('validate', userValidators.validatePassword)
+userSchema.pre('validate', userRecordUtils.setHashedPassword)
+userSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
 
 const User = mongoose.model('User', userSchema)
 

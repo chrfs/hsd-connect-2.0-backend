@@ -26,9 +26,9 @@ const projectGroupMessageSchema = new mongoose.Schema({
 })
 
 projectGroupMessageSchema.pre(
-  'save',
+  'validate',
   schemaValidators.validateLength('content', 2, 300)
 )
-projectGroupMessageSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
+projectGroupMessageSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
 
 export default projectGroupMessageSchema

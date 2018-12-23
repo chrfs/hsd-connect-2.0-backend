@@ -2,10 +2,10 @@ import mongoose from 'mongoose'
 import { schemaUtils } from '../../utils/models/schemaUtils'
 
 const notificationSchema = new mongoose.Schema({
-  type: {
+  origin: {
     type: mongoose.Schema.Types.String
   },
-  typeId: {
+  originId: {
     type: mongoose.Schema.Types.ObjectId
   },
   isActive: {
@@ -22,6 +22,6 @@ const notificationSchema = new mongoose.Schema({
   }
 })
 
-notificationSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
+notificationSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
 
 export default notificationSchema

@@ -3,7 +3,6 @@ import Jimp from 'jimp'
 import fileType from 'file-type'
 import mkdirp from 'mkdirp'
 import fs from 'fs'
-import Image from '../models/Image'
 
 const checkFileType = {
   image: (parsedFile) => {
@@ -13,51 +12,95 @@ const checkFileType = {
       'image/webp',
       'image/png'
     ]
-    return acceptedTypes.includes(parsedFile.mimeType.toString())
+    return acceptedTypes.includes(fileType(parsedFile.body).mime)
   }
 }
 
 export const parse = {
   images: (imageArr) => {
-    return imageArr.reduce((acc, image) => {
-      const parsedFile = parseDataURL(image.data)
-      if (!checkFileType.image(parsedFile)) return acc
-      parsedFile.id = image.id
-      acc.push(parsedFile)
+    const parsedImages = imageArr.reduce((acc, image) => {
+      if (image._id) {
+        acc.push(image)
+        return acc
+      }
+      const parsedImage = parseDataURL(image.data)
+      if (!checkFileType.image(parsedImage)) return acc
+      const imageType = fileType(parsedImage.body)
+      parsedImage.name = parse.fileName(image.name, imageType.ext)
+      parsedImage.mime = imageType.mime
+      acc.push(parsedImage)
       return acc
     }, [])
+
+    return parse.processImages(parsedImages)
   },
-  compressableImages: (parsedFile) => {
+  fileArrSize (fileArr) {
+    return fileArr.reduce((acc, file) => acc + file.size, 0)
+  },
+  fileName: (fileName, ext, len = 6) => {
+    let newFileName = fileName.replace('.' + ext, '').replace(/[^a-z0-9]|\s+|\r?\n|\r/gmi, '')
+    newFileName = String(newFileName).length >= len ? newFileName.substr(0, 5) : Math.random().toString(36).substring(len)
+    return newFileName.toLowerCase() + (new Date().getTime()) + '.' + ext
+  },
+  processImages: async (parsedImages) => {
     const compressableTypes = [
       'image/jpeg',
       'image/png'
     ]
-    const result = {
-      compressable: [],
-      notCompressable: []
-    }
-    return parsedFile.reduce((acc, image) => {
-      const isCompressable = compressableTypes.includes(image.mimeType.toString())
+    const images = parsedImages.reduce((acc, image, index) => {
+      image.orderNo = index
+      const isCompressable = compressableTypes.includes(image.mime)
       if (isCompressable) acc.compressable.push(image)
-      else acc.notCompressable.push(image)
+      else acc.inCompressable.push(image)
       return acc
-    }, result)
+    }, {
+      saveDir: getFileDir(),
+      compressable: [],
+      inCompressable: []
+    })
+    images.inCompressable = process.inCompressableImages(images.saveDir, images.inCompressable)
+    images.compressable = await process.compressableImages(images.saveDir, images.compressable)
+    return {
+      saveDir: images.saveDir,
+      files: images.compressable.concat(images.inCompressable).sort((img1, img2) => img1.orderNo - img2.orderNo)
+    }
   }
 }
 
-export const compress = {
-  images: async (imageArr) => {
-    const images = await Promise.all(imageArr.map((image) => (Jimp.read(image.body))))
-    return images.map((image) => {
-      if (image.bitmap.width <= 1000) {
-        return image
+const process = {
+  compressableImages: async (imageDir, imageArr) => {
+    const jimpImages = await Promise.all(imageArr.map((image) => {
+      return image.body ? Jimp.read(image.body) : image
+    }))
+    return Promise.all(jimpImages.map(async (image, imageIndex) => {
+      const newImage = {
+        name: imageArr[imageIndex].name,
+        mime: imageArr[imageIndex].mime,
+        orderNo: imageArr[imageIndex].orderNo,
+        path: image.path || imageDir,
+        size: image.size
       }
-      return image.resize(600, Jimp.AUTO)
+      if (image._id) return newImage
+      newImage.data = image.bitmap.width >= 600 ? (await image.resize(600, Jimp.AUTO).quality(80)) : (await image.quality(80))
+      newImage.size = (await image.getBufferAsync(Jimp.AUTO)).byteLength
+      return newImage
+    }))
+  },
+  inCompressableImages: (imageDir, imageArr) => {
+    return imageArr.map((image) => {
+      return {
+        name: image.name,
+        size: image.size || image.body.length,
+        mime: image.mime,
+        orderNo: image.orderNo,
+        path: image.path || imageDir,
+        data: image.body
+      }
     })
   }
 }
 
-const getImageDir = () => {
+const getFileDir = () => {
   const newDate = new Date()
   const month = (newDate).getMonth() + 1
   const day = (newDate).getDate()
@@ -65,36 +108,24 @@ const getImageDir = () => {
   return './media/images/' + year + '/' + month + '/' + day + '/'
 }
 
-export const save = {
-  images: async (imagesArr) => {
+export const saveFiles = {
+  images: async (saveDir, images) => {
     try {
-      const imageDir = getImageDir()
-      if (!fs.existsSync(imageDir)) {
-        await mkdirp.sync(imageDir)
-      }
-      const imageBufferArr = parse.images(imagesArr)
-      const images = parse.compressableImages(imageBufferArr)
-      const compressedImages = await compress.images(images.compressable)
+      if (!fs.existsSync(saveDir)) await mkdirp.sync(saveDir)
 
-      const imagesPathArr = []
-      await Promise.all(compressedImages.map((image, index) => {
-        const imagePath = imageDir + imageBufferArr[index].id + '.' + image.getExtension()
-        imagesPathArr.push(imagePath)
-        return image.writeAsync(imagePath)
-      }))
-
-      await Promise.all(images.notCompressable.map((image) => {
-        const imagePath = imageDir + image.id + '.' + fileType(image.body).ext
-        imagesPathArr.push(imagePath)
-        return fs.writeFileSync(imagePath, image.body)
-      }))
-
-      return await Promise.all(imagesPathArr.map(async (imgPath) => {
-        const newImage = await (new Image({ path: imgPath })).save()
-        return newImage._id
+      return Promise.all(images.map(image => {
+        const imagePath = image.path + image.name
+        if (!fs.existsSync(imagePath)) {
+          return image.data instanceof Jimp ? image.data.writeAsync(imagePath) : fs.writeFileSync(imagePath, image.data)
+        }
       }))
     } catch (err) {
       throw err
     }
   }
+}
+
+export const deleteFile = (filePath) => {
+  if (!fs.existsSync(filePath)) return
+  return fs.unlinkSync(filePath)
 }

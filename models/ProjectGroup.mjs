@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { schemaUtils } from '../utils/models/schemaUtils'
-import projectGroupMessageSchema from './sub/ProjectGroupMessage'
+import ProjectGroupMessage from './sub/ProjectGroupMessage'
 
 const projectGroupSchema = new mongoose.Schema({
   project: {
@@ -15,7 +15,7 @@ const projectGroupSchema = new mongoose.Schema({
     default: []
   },
   messages: {
-    type: [projectGroupMessageSchema],
+    type: [ProjectGroupMessage],
     default: []
   },
   updatedAt: {
@@ -28,7 +28,7 @@ const projectGroupSchema = new mongoose.Schema({
   }
 })
 
-projectGroupSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
+projectGroupSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
 
 const ProjectGroup = mongoose.model('ProjectGroup', projectGroupSchema)
 

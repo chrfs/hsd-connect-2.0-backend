@@ -48,6 +48,7 @@ describe('ProjectFeedback', function () {
     it('should throw a comment type error', async () => {
       await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: ''}))
     })
+    
     it('should throw a invalid content ValidationError', async () => {
       await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [{...newProjectFeedbackCommentProperties(), content: 'ts'}]}))
     })
