@@ -4,6 +4,7 @@ import Project from '../../../models/Project'
 import fs from 'fs'
 import authorization from './middleware/authorization'
 import { parse, saveFiles, deleteFile } from '../../../utils/file'
+import mongoose from 'mongoose'
 
 const router = new KoaRouter({
   prefix: '/projects'
@@ -49,7 +50,11 @@ router.get('/', async ctx => {
 })
 
 router.get('/:projectId', async ctx => {
-  const project = (await Project.findOne({ _id: ctx.params.projectId }).select('-images.path'))
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.projectId)) {
+    ctx.status = 404
+    return
+  }
+  const project = (await Project.findOne({ _id: ctx.params.projectId }).populate('user').populate('members').populate('likedBy').select('-images.path'))
   ctx.body = project
 })
 
@@ -63,7 +68,7 @@ router.post('/', async ctx => {
     const projectProperties = ctx.request.fields
     projectProperties.user = ctx.state.user._id
     const newProject = Project.createProject(projectProperties)
-    const parsedImages = await parse.images(projectProperties.images)
+    const parsedImages = await parse.images(projectProperties.images, 1000)
     newProject.images = parsedImages.files
     await newProject.validate()
     await saveFiles.images(parsedImages.saveDir, parsedImages.files)
@@ -82,7 +87,7 @@ router.put('/:projectId', async ctx => {
       return
     }
     const requestedProject = Project.updateProject(project, ctx.request.fields)
-    const parsedImages = await parse.images(ctx.request.fields.images)
+    const parsedImages = await parse.images(ctx.request.fields.images, 1000)
     requestedProject.images = parsedImages.files
     await requestedProject.validate()
     await saveFiles.images(parsedImages.saveDir, parsedImages.files)

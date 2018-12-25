@@ -13,7 +13,7 @@ const projectSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'Users'
+    ref: 'User'
   },
   title: {
     type: mongoose.Schema.Types.String,
@@ -30,12 +30,12 @@ const projectSchema = new mongoose.Schema({
   likedBy: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],
-    ref: 'Users'
+    ref: 'User'
   },
   members: {
     type: [mongoose.Schema.Types.ObjectId],
     default: [],
-    ref: 'Users'
+    ref: 'User'
   },
   searchingParticipants: {
     type: mongoose.Schema.Types.Boolean,
@@ -57,7 +57,7 @@ const projectSchema = new mongoose.Schema({
 projectSchema.pre('validate', schemaValidators.validateLength('title', 25, 65))
 projectSchema.pre(
   'validate',
-  schemaValidators.validateLength('description', 300, 1500)
+  schemaValidators.validateLength('description', 300, 4000)
 )
 projectSchema.pre(
   'validate',

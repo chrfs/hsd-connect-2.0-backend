@@ -17,7 +17,7 @@ const checkFileType = {
 }
 
 export const parse = {
-  images: (imageArr) => {
+  images: (imageArr, maxWidth) => {
     const parsedImages = imageArr.reduce((acc, image) => {
       if (image._id) {
         acc.push(image)
@@ -32,17 +32,17 @@ export const parse = {
       return acc
     }, [])
 
-    return parse.processImages(parsedImages)
+    return parse.processImages(parsedImages, maxWidth)
   },
   fileArrSize (fileArr) {
     return fileArr.reduce((acc, file) => acc + file.size, 0)
   },
-  fileName: (fileName, ext, len = 6) => {
+  fileName: (fileName, ext, len = 5) => {
     let newFileName = fileName.replace('.' + ext, '').replace(/[^a-z0-9]|\s+|\r?\n|\r/gmi, '')
     newFileName = String(newFileName).length >= len ? newFileName.substr(0, 5) : Math.random().toString(36).substring(len)
     return newFileName.toLowerCase() + (new Date().getTime()) + '.' + ext
   },
-  processImages: async (parsedImages) => {
+  processImages: async (parsedImages, maxWidth) => {
     const compressableTypes = [
       'image/jpeg',
       'image/png'
@@ -59,7 +59,7 @@ export const parse = {
       inCompressable: []
     })
     images.inCompressable = process.inCompressableImages(images.saveDir, images.inCompressable)
-    images.compressable = await process.compressableImages(images.saveDir, images.compressable)
+    images.compressable = await process.compressableImages(images.saveDir, images.compressable, maxWidth)
     return {
       saveDir: images.saveDir,
       files: images.compressable.concat(images.inCompressable).sort((img1, img2) => img1.orderNo - img2.orderNo)
@@ -68,7 +68,7 @@ export const parse = {
 }
 
 const process = {
-  compressableImages: async (imageDir, imageArr) => {
+  compressableImages: async (imageDir, imageArr, maxWidth) => {
     const jimpImages = await Promise.all(imageArr.map((image) => {
       return image.body ? Jimp.read(image.body) : image
     }))
@@ -81,7 +81,7 @@ const process = {
         size: image.size
       }
       if (image._id) return newImage
-      newImage.data = image.bitmap.width >= 600 ? (await image.resize(600, Jimp.AUTO).quality(80)) : (await image.quality(80))
+      newImage.data = image.bitmap.width >= maxWidth ? (await image.resize(maxWidth, Jimp.AUTO).quality(80)) : (await image.quality(80))
       newImage.size = (await image.getBufferAsync(Jimp.AUTO)).byteLength
       return newImage
     }))
