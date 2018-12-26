@@ -29,20 +29,15 @@ router.get('/:projectId/images/:imageToken', async ctx => {
   }
 })
 
-router.delete('/:projectId/images/:imageToken', async ctx => {
-  try {
-    const { projectId, imageToken } = ctx.params
-    await Project.update({_id: projectId}, {$pull: { images: {token: imageToken} }})
-  } catch (err) {
-    throw err
-  }
-})
-
 router.use(authorization)
 
 router.get('/', async ctx => {
   try {
-    const projects = await Project.find().select('-images.path')
+    const projects = await Project.find().populate({
+      path: 'user',
+      model: 'User',
+      select: 'firstname lastname'
+    }).select('-images.path')
     ctx.body = projects
   } catch (err) {
     throw err
@@ -50,11 +45,19 @@ router.get('/', async ctx => {
 })
 
 router.get('/:projectId', async ctx => {
-  if (!mongoose.Types.ObjectId.isValid(ctx.params.projectId)) {
+  if (!mongoose.Types.ObjectId.isValid(ctx.params.projectId)) {
     ctx.status = 404
     return
   }
-  const project = (await Project.findOne({ _id: ctx.params.projectId }).populate('user').populate('members').populate('likedBy').select('-images.path'))
+  const project = (await Project.findOne({ _id: ctx.params.projectId }).populate({
+    path: 'user',
+    model: 'User',
+    select: 'firstname lastname image'
+  }).populate({
+    path: 'members',
+    model: 'User',
+    select: 'firstname lastname image'
+  }).select('-images.path'))
   ctx.body = project
 })
 
@@ -86,12 +89,15 @@ router.put('/:projectId', async ctx => {
       ctx.status = 401
       return
     }
-    const requestedProject = Project.updateProject(project, ctx.request.fields)
+    project.title = ctx.request.fields.title
+    project.description = ctx.request.fields.description
+    project.images = ctx.request.fields.images
+    project.searchingParticipants = ctx.request.fields.searchingParticipants
     const parsedImages = await parse.images(ctx.request.fields.images, 1000)
-    requestedProject.images = parsedImages.files
-    await requestedProject.validate()
+    project.images = parsedImages.files
+    await project.validate()
     await saveFiles.images(parsedImages.saveDir, parsedImages.files)
-    const updatedProject = await requestedProject.save()
+    const updatedProject = await project.save()
     const deletedImages = previousImages.filter((img1) => {
       return !updatedProject.images.some((img2) => img1.name === img2.name)
     })

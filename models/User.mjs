@@ -47,8 +47,9 @@ const userSchema = new mongoose.Schema({
     }
   },
   bookmarkedProjects: {
-    type: mongoose.Schema.Types.Array,
-    ref: 'Projects'
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Project',
+    default: []
   },
   authorization: {
     type: mongoose.Schema.Types.Mixed,
@@ -90,7 +91,6 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true },
   toJSON: { virtuals: true }
 })
-userSchema.virtual('fullname').get(function () { return this.firstname + ' ' + this.lastname })
 userSchema.pre('validate', userRecordUtils.setNameOfEmail)
 userSchema.pre('validate', userValidators.validateEmail)
 userSchema.pre(

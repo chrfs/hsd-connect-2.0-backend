@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import env from '../../../config/env'
 import authorization from './middleware/authorization'
 import User from '../../../models/User'
+import Project from '../../../models/Project'
 
 const router = new KoaRouter({
   prefix: '/users'
@@ -54,7 +55,7 @@ router.post('/auth', async ctx => {
       return
     }
     const user = await User.findOne({ email }).select(
-      '_id firstname lastname email password'
+      '_id firstname lastname email password bookmarkedProjects settings'
     )
     const authStatus = await authenticateUser(password, user)
     if (!authStatus) {
@@ -72,16 +73,41 @@ router.post('/auth', async ctx => {
 
 router.use(authorization)
 
-router.get('/', async ctx => {
-  const users = await User.find({ lean: true }).select(
-    '_id firstname lastname email'
-  )
-  ctx.body = { users }
+router.get('/:userId', async ctx => {
+  try {
+    if (ctx.state.user._id !== ctx.params.userId) {
+      ctx.status = 401
+      return
+    }
+    const user = await User.findOne({ _id: ctx.params.userId})
+    ctx.body = { user }
+  } catch (err) {
+    throw err
+  }
 })
 
-router.get('/:_id', async ctx => {
-  const user = await User.find({ _id: ctx.params._id })
-  ctx.body = { user }
+router.put('/:userId/bookmark/:projectId', async ctx => {
+  try {
+    if (ctx.params.userId !== ctx.state.user._id) {
+      ctx.status = 401
+      return
+    }
+    const user = await User.findOne({ _id: ctx.params.userId})
+    const project = await Project.findOne({ _id: ctx.params.projectId})
+    if (!user || !project) {
+      ctx.status = 404
+      return
+    }
+    if (user.bookmarkedProjects.some(bookmark => bookmark.equals(project._id))) {
+      user.bookmarkedProjects.splice(user.bookmarkedProjects.indexOf(project._id), 1)
+    } else {
+      user.bookmarkedProjects.push(project._id)
+    }
+    await user.save()
+    ctx.body = {bookmarkedProjects: user.bookmarkedProjects}
+  } catch (err) {
+    throw err
+  }
 })
 
 export default router
