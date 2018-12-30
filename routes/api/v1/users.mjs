@@ -79,7 +79,9 @@ router.get('/:userId', async ctx => {
       ctx.status = 401
       return
     }
-    const user = await User.findOne({ _id: ctx.params.userId})
+    const user = await User.findOne({ _id: ctx.params.userId }).select(
+      '_id firstname lastname email bookmarkedProjects settings'
+    )
     ctx.body = { user }
   } catch (err) {
     throw err
@@ -92,8 +94,8 @@ router.put('/:userId/bookmark/:projectId', async ctx => {
       ctx.status = 401
       return
     }
-    const user = await User.findOne({ _id: ctx.params.userId})
-    const project = await Project.findOne({ _id: ctx.params.projectId})
+    const user = await User.findOne({ _id: ctx.params.userId })
+    const project = await Project.findOne({ _id: ctx.params.projectId })
     if (!user || !project) {
       ctx.status = 404
       return

@@ -6,14 +6,14 @@ export const schemaValidators = {
     minLength = 0,
     maxLength = 0
   ) {
-    return function (next) {
+    return async function (next) {
       try {
         if (!this.isNew && !this.isModified(propertyName)) return next()
         const isValid =
           this[propertyName].length >= minLength &&
           this[propertyName].length <= maxLength
         if (!isValid) {
-          schemaValidatorErrors.throwInvalidLength(propertyName, minLength, maxLength)
+          throw new ValidationError(propertyName, schemaValidatorMessages.invalidLength(propertyName, minLength, maxLength))
         }
         return next()
       } catch (err) {
@@ -44,8 +44,10 @@ export const schemaUtils = {
   }
 }
 
-export const schemaValidatorErrors = {
-  throwInvalidLength: function (propertyName, minLength, maxLength) {
+export const schemaValidatorMessages = {
+  invalidLength: (propertyName = 'field',
+    minLength = 0,
+    maxLength = 0) => {
     let err = `The ${propertyName} has to have a `
     if (minLength && maxLength) {
       err += `length between ${minLength} and ${maxLength} characters.`
@@ -54,11 +56,8 @@ export const schemaValidatorErrors = {
         ? `min length of ${minLength} characters.`
         : `max length of ${maxLength} characters.`
     }
-    throw new ValidationError(propertyName, err)
-  }
-}
-
-export const schemaValidatorMessages = {
+    return err
+  },
   isRequired: (propertyName = 'field') => {
     return `The ${propertyName} is required, please fill it out.`
   }

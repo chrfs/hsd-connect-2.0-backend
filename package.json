@@ -35,7 +35,7 @@
     "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard \"./**/*.mjs\" \"!./test/\" && NODE_ENV=development node -r esm ./app.mjs'",
     "prettier": "prettier-standard \"./**/*.mjs\"",
     "start": "NODE_ENV=production node -r @std/esm ./app.mjs",
-    "test": "NODE_ENV=test mocha -r esm ./test/**/*.js"
+    "test": "NODE_ENV=test mocha --timeout 10000 -r esm ./test/**/*.js"
   },
   "devDependencies": {
     "mocha": "^5.2.0",

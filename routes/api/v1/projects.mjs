@@ -1,6 +1,7 @@
 import KoaRouter from 'koa-router'
 import fileType from 'file-type'
 import Project from '../../../models/Project'
+import ProjectFeedback from '../../../models/ProjectFeedback'
 import fs from 'fs'
 import authorization from './middleware/authorization'
 import { parse, saveFiles, deleteFile } from '../../../utils/file'
@@ -57,7 +58,12 @@ router.get('/:projectId', async ctx => {
     path: 'members',
     model: 'User',
     select: 'firstname lastname image'
-  }).select('-images.path'))
+  }).select('-images.path')).toObject()
+  project.feedback = await ProjectFeedback.find({ project: ctx.params.projectId }).populate({
+    path: 'user',
+    model: 'User',
+    select: 'firstname lastname image optionalInformation'
+  })
   ctx.body = project
 })
 
@@ -84,7 +90,7 @@ router.post('/', async ctx => {
 router.put('/:projectId', async ctx => {
   try {
     const project = await Project.findOne({ _id: ctx.params.projectId })
-    const previousImages = JSON.parse(JSON.stringify(project.images))
+    const previousImages = JSON.parse(JSON.stringify(project.images || []))
     if (!project.user._id.equals(ctx.state.user._id)) {
       ctx.status = 401
       return
@@ -93,7 +99,17 @@ router.put('/:projectId', async ctx => {
     project.description = ctx.request.fields.description
     project.images = ctx.request.fields.images
     project.searchingParticipants = ctx.request.fields.searchingParticipants
-    const parsedImages = await parse.images(ctx.request.fields.images, 1000)
+    const receivedImages = ctx.request.fields.images.map(image => {
+      if (!image._id || !Number.isFinite(image.orderNo)) {
+        return image
+      }
+      const previousImage = previousImages.find(img => img._id === image._id)
+      if (!previousImage) {
+        return
+      }
+      return { ...previousImage, orderNo: Number.parseInt(image.orderNo, 10) }
+    })
+    const parsedImages = await parse.images(receivedImages, 1000)
     project.images = parsedImages.files
     await project.validate()
     await saveFiles.images(parsedImages.saveDir, parsedImages.files)
@@ -104,6 +120,62 @@ router.put('/:projectId', async ctx => {
     await Promise.all(deletedImages.map(async (image) => {
       await deleteFile((image.path + image.name))
     }))
+  } catch (err) {
+    throw err
+  }
+})
+
+router.post('/:projectId/feedback', async ctx => {
+  try {
+    const { feedback } = ctx.request.fields
+    const feedbackId = (await (new ProjectFeedback({
+      content: feedback.content,
+      project: ctx.params.projectId,
+      user: ctx.state.user._id
+    })).save())._id
+    ctx.body = await ProjectFeedback.findOne({ _id: feedbackId }).populate({
+      path: 'user',
+      model: 'User',
+      select: 'firstname lastname image optionalInformation'
+    })
+  } catch (err) {
+    throw err
+  }
+})
+
+router.put('/:projectId/feedback/:feedbackId/like', async ctx => {
+  try {
+    const projectfeedback = await ProjectFeedback.findOne({ project: ctx.params.projectId, _id: ctx.params.feedbackId })
+    if (!projectfeedback) {
+      ctx.status = 404
+      return
+    }
+    if (projectfeedback.likedBy.some(userId => userId.equals(ctx.state.user._id))) {
+      projectfeedback.likedBy.splice(projectfeedback.likedBy.indexOf(ctx.state.user._id), 1)
+    } else {
+      projectfeedback.likedBy.push(ctx.state.user._id)
+    }
+    await projectfeedback.save()
+    ctx.body = { likedBy: projectfeedback.likedBy }
+  } catch (err) {
+    throw err
+  }
+})
+
+router.put('/:projectId/like', async ctx => {
+  try {
+    const project = await Project.findOne({ _id: ctx.params.projectId })
+    if (!project) {
+      ctx.status = 404
+      return
+    }
+    if (project.likedBy.some(userId => userId.equals(ctx.state.user._id))) {
+      project.likedBy.splice(project.likedBy.indexOf(ctx.state.user._id), 1)
+    } else {
+      project.likedBy.push(ctx.state.user._id)
+    }
+    await project.save()
+    ctx.body = { likedBy: project.likedBy }
   } catch (err) {
     throw err
   }
