@@ -42,8 +42,8 @@ const imageSchema = new mongoose.Schema({
   toJSON: { virtuals: true }
 })
 
-imageSchema.pre('validate', schemaValidators.validateLength('name', 5, 22))
-imageSchema.pre('validate', function (next) {
+imageSchema.pre('save', schemaValidators.validateLength('name', 5, 22))
+imageSchema.pre('save', function (next) {
   this.token = uuidv4()
   next()
 })

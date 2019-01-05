@@ -63,6 +63,10 @@ router.get('/:projectId', async ctx => {
     path: 'user',
     model: 'User',
     select: 'firstname lastname image optionalInformation'
+  }).populate({
+    path: 'comments.user',
+    model: 'User',
+    select: 'firstname lastname image optionalInformation'
   })
   ctx.body = project
 })
@@ -128,16 +132,28 @@ router.put('/:projectId', async ctx => {
 router.post('/:projectId/feedback', async ctx => {
   try {
     const { feedback } = ctx.request.fields
-    const feedbackId = (await (new ProjectFeedback({
+    const projectfeedbackId = (await (new ProjectFeedback({
       content: feedback.content,
       project: ctx.params.projectId,
       user: ctx.state.user._id
     })).save())._id
-    ctx.body = await ProjectFeedback.findOne({ _id: feedbackId }).populate({
+    ctx.body = await ProjectFeedback.findOne({ _id: projectfeedbackId }).populate({
       path: 'user',
       model: 'User',
       select: 'firstname lastname image optionalInformation'
     })
+  } catch (err) {
+    throw err
+  }
+})
+
+router.post('/:projectId/feedback/:feedbackId/comment', async ctx => {
+  try {
+    const { comment } = ctx.request.fields
+    const projectFeedback = await ProjectFeedback.findOne({ _id: ctx.params.feedbackId })
+    projectFeedback.comment.push(comment)
+    await projectFeedback.validate()
+    ctx.body = await projectFeedback.save()
   } catch (err) {
     throw err
   }

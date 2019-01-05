@@ -17,7 +17,7 @@ const newProjectFeedbackProperties = () => {
 }
 
 export const createProjectFeedback = (projectFeedbackProperties = newProjectFeedbackProperties()) => {
-  return (new ProjectFeedback(projectFeedbackProperties)).save()
+  return (new ProjectFeedback(projectFeedbackProperties))
 }
 
 const newProjectFeedbackCommentProperties = () => {
@@ -33,24 +33,24 @@ after(async () => mongoClient.disconnect())
 
 describe('ProjectFeedback', function () {
   it('should save a new record', async () => {
-    assert(await createProjectFeedback())
+    assert(await createProjectFeedback().save())
   })
 
   it('should throw an invalid content ValidatorError', async () => {
-    await assert.rejects(createProjectFeedback({...newProjectFeedbackProperties(), content: 'ts'}))
+    await assert.rejects(createProjectFeedback({...newProjectFeedbackProperties(), content: 'ts'}).validate())
   })
 
   describe('ProjectFeedbackComment', function () {
     it('should save a new record', async () => {
-      assert(await createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [newProjectFeedbackCommentProperties()]}))
+      assert(await createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [newProjectFeedbackCommentProperties()]}).save())
     })
     
     it('should throw a comment type error', async () => {
-      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: ''}))
+      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: ''}).validate())
     })
     
     it('should throw a invalid content ValidationError', async () => {
-      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [{...newProjectFeedbackCommentProperties(), content: 'ts'}]}))
+      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [{...newProjectFeedbackCommentProperties(), content: 'ts'}]}).save())
     })
   })
 })

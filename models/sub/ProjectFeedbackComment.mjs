@@ -9,7 +9,7 @@ const projectFeedbackCommentSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'Users'
+    ref: 'User'
   },
   content: {
     type: mongoose.Schema.Types.String,
@@ -26,11 +26,11 @@ const projectFeedbackCommentSchema = new mongoose.Schema({
 })
 
 projectFeedbackCommentSchema.pre(
-  'validate',
+  'save',
   schemaValidators.validateLength('content', 5, 300)
 )
 projectFeedbackCommentSchema.pre(
-  'validate',
+  'save',
   schemaUtils.setPropertyDate('updatedAt')
 )
 

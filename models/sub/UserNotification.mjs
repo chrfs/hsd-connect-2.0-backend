@@ -22,6 +22,6 @@ const notificationSchema = new mongoose.Schema({
   }
 })
 
-notificationSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
+notificationSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 export default notificationSchema

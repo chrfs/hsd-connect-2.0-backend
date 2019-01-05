@@ -29,6 +29,6 @@ projectGroupMessageSchema.pre(
   'validate',
   schemaValidators.validateLength('content', 2, 300)
 )
-projectGroupMessageSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
+projectGroupMessageSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 export default projectGroupMessageSchema
