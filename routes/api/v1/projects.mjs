@@ -141,6 +141,10 @@ router.post('/:projectId/feedback', async ctx => {
       path: 'user',
       model: 'User',
       select: 'firstname lastname image optionalInformation'
+    }).populate({
+      path: 'comments.user',
+      model: 'User',
+      select: 'firstname lastname image optionalInformation'
     })
   } catch (err) {
     throw err
@@ -151,9 +155,19 @@ router.post('/:projectId/feedback/:feedbackId/comment', async ctx => {
   try {
     const { comment } = ctx.request.fields
     const projectFeedback = await ProjectFeedback.findOne({ _id: ctx.params.feedbackId })
-    projectFeedback.comment.push(comment)
+    comment.user = ctx.state.user._id
+    projectFeedback.comments.push(comment)
     await projectFeedback.validate()
-    ctx.body = await projectFeedback.save()
+    await projectFeedback.save()
+    ctx.body = await ProjectFeedback.findOne({ _id: ctx.params.feedbackId }).populate({
+      path: 'user',
+      model: 'User',
+      select: 'firstname lastname image optionalInformation'
+    }).populate({
+      path: 'comments.user',
+      model: 'User',
+      select: 'firstname lastname image optionalInformation'
+    })
   } catch (err) {
     throw err
   }

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import userNotificationSchema from './sub/UserNotification'
+import Image from './sub/Image'
 import {
   schemaValidators,
   schemaUtils,
@@ -64,8 +65,8 @@ const userSchema = new mongoose.Schema({
     default: []
   },
   image: {
-    type: [mongoose.Schema.Types.String],
-    default: []
+    type: Image,
+    default: null
   },
   isActive: {
     type: mongoose.Schema.Types.Boolean,
