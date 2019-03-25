@@ -1,51 +1,75 @@
 {
   "name": "hsd_connect_2_0_backend",
-  "version": "0.0.1",
-  "main": "index.js",
-  "module": "main.js",
+  "version": "0.1.0",
+  "description": "A starting point for Node.js express apps with TypeScript",
   "repository": {
     "type": "git",
-    "url": "ssh://git@gitlab.chrcode.com:3000/hsd/hsd-connect-2.0/backend.git"
+    "url": "git@github.com:chroriginal/hsd-connect-2.0-backend.git"
   },
   "author": "Abdelmoez Cherif <a.cherif@me.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "npm run serve",
+    "build": "npm run npm run build-ts && npm run tslint",
+    "serve": "node dist/server.js",
+    "watch-node": "nodemon dist/server.js",
+    "watch": "NODE_ENV='development' concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "test": "jest --forceExit --coverage --verbose",
+    "watch-test": "npm run test -- --watchAll",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w --skipLibCheck",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "debug": "npm run build && npm run watch-debug",
+    "serve-debug": "nodemon --inspect dist/server.js",
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+  },
   "dependencies": {
-    "@koa/cors": "^2.2.2",
+    "@koa/cors": "^2.2.3",
     "bcrypt": "^2.0.1",
     "data-urls": "^1.1.0",
-    "esm": "^3.0.84",
-    "file-type": "^10.6.0",
+    "file-type": "^10.9.0",
     "flatted": "^2.0.0",
     "fs": "0.0.1-security",
     "jimp": "^0.6.0",
-    "jsonwebtoken": "^8.3.0",
-    "koa": "^2.5.3",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.7.0",
     "koa-better-body": "^3.0.4",
     "koa-convert": "^1.2.0",
+    "koa-helmet": "^4.1.0",
     "koa-morgan": "^1.0.1",
     "koa-router": "^7.4.0",
     "mkdirp": "^0.5.1",
-    "mongoose": "^5.2.15",
-    "sharp": "^0.21.1",
+    "mongoose": "^5.4.19",
+    "sharp": "^0.21.3",
     "uuid": "^3.3.2",
-    "winston": "^3.1.0",
-    "winston-daily-rotate-file": "^3.3.3"
-  },
-  "scripts": {
-    "dev": "nodemon --watch ./ --ext mjs,js --exec 'standard \"./**/*.mjs\" \"!./test/\" && NODE_ENV=development node -r esm ./app.mjs'",
-    "prettier": "prettier-standard \"./**/*.mjs\"",
-    "start": "NODE_ENV=production node -r @std/esm ./app.mjs",
-    "test": "NODE_ENV=test mocha --timeout 10000 -r esm ./test/**/*.js"
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^3.8.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/jsonwebtoken": "^8.3.2",
+    "@types/koa": "^2.0.48",
+    "@types/koa-better-body": "^3.0.0",
+    "@types/koa-convert": "^1.2.2",
+    "@types/koa-helmet": "^3.1.2",
+    "@types/koa-router": "^7.0.40",
+    "@types/koa__cors": "^2.2.3",
+    "@types/mkdirp": "^0.5.2",
+    "@types/mongodb": "^3.1.22",
+    "@types/mongoose": "^4.7.45",
+    "@types/node": "^9.6.47",
+    "@types/uuid": "^3.4.4",
+    "@types/winston": "^2.4.4",
+    "concurrently": "^3.6.1",
     "mocha": "^5.2.0",
-    "nodemon": "^1.17.5",
+    "node-sass": "^4.11.0",
+    "nodemon": "^1.18.10",
     "prettier-standard": "^8.0.1",
-    "standard": "^11.0.1"
-  },
-  "standard": {
-    "ignore": [
-      "test"
-    ]
+    "standard": "^11.0.1",
+    "ts-node": "^5.0.1",
+    "tslint": "^5.14.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^2.9.2"
   }
 }
