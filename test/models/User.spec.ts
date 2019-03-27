@@ -1,8 +1,8 @@
-import { strict as assert} from 'assert'
-import mongoClient from '../../mongo'
-import User from './../../models/User'
-import { userValidationErrors } from '../../utils/models/userUtils'
-import { createString } from '../../utils/test'
+import assert from 'assert'
+import mongoClient from '../../src/mongo'
+import User from '../../src/models/User'
+import { userValidationErrors } from '../../src/utils/models/userUtils'
+import { createString } from '../utils/test'
 
 const newUserProperties = () => {
   return {
@@ -11,10 +11,10 @@ const newUserProperties = () => {
   }
 }
 
-const createUser = (userProperties = newUserProperties()) => User.createUser(userProperties)
+const createUser = (userProperties = newUserProperties()) => User.create(userProperties)
 
 before(async () => mongoClient.connect())
-afterEach(async () => User.deleteMany())
+afterEach(async () => User.deleteMany({}))
 after(async () => mongoClient.disconnect())
 
 describe('User', function () {
@@ -22,7 +22,7 @@ describe('User', function () {
     assert.equal((await createUser()).isNew, false)
   })
 
-  it('should update a record property', async () =>  {
+  it('should update a record property', async () => {
     const newUser = await createUser()
     newUser.isVerified = true
     assert.equal((await newUser.save()).isVerified, true)
@@ -31,15 +31,18 @@ describe('User', function () {
   it('should throw an invalid password ValidationError', async () => {
     const newUser = await createUser()
     newUser.password = '38uwZ3zUe'
+    // @ts-ignore
     await assert.rejects(newUser.save(), userValidationErrors.invalidPassword)
   })
 
   it('should throw an invalid email ValidationError', async () => {
-    await assert.rejects(createUser({...newUserProperties(), email: 'not.valid@hs-duesseldorf.com'}), userValidationErrors.invalidEmail)
+    // @ts-ignore
+    await assert.rejects(createUser({ ...newUserProperties(), email: 'not.valid@hs-duesseldorf.com' }), userValidationErrors.invalidEmail)
   })
 
   it('should throw a duplicate email ValidationError', async () => {
     const newUser = await createUser()
-    await assert.rejects(createUser({...newUserProperties(), email: newUser.email}), userValidationErrors.uniqueEmail)
+    // @ts-ignore
+    await assert.rejects(createUser({ ...newUserProperties(), email: newUser.email }), userValidationErrors.uniqueEmail)
   })
 })

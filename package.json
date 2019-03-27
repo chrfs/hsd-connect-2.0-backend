@@ -1,7 +1,7 @@
 {
   "name": "hsd_connect_2_0_backend",
   "version": "0.1.0",
-  "description": "A starting point for Node.js express apps with TypeScript",
+  "description": "HSD Connect",
   "repository": {
     "type": "git",
     "url": "git@github.com:chroriginal/hsd-connect-2.0-backend.git"
@@ -14,14 +14,12 @@
     "serve": "node dist/server.js",
     "watch-node": "nodemon dist/server.js",
     "watch": "NODE_ENV='development' concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
-    "test": "NODE_ENV=test mocha --timeout 10000 -r ./test/**/*.js",
-    "watch-test": "npm run test -- --watchAll",
+    "test": "NODE_ENV=test mocha --require ts-node/register test/**/*.spec.ts",
     "build-ts": "tsc",
     "watch-ts": "tsc -w --skipLibCheck",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "copy-static-assets": "ts-node copyStaticAssets.ts",
     "debug": "npm run build && npm run watch-debug",
-    "serve-debug": "nodemon --inspect dist/server.js",
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "dependencies": {
@@ -56,6 +54,7 @@
     "@types/koa-router": "^7.0.40",
     "@types/koa__cors": "^2.2.3",
     "@types/mkdirp": "^0.5.2",
+    "@types/mocha": "^5.2.6",
     "@types/mongodb": "^3.1.22",
     "@types/mongoose": "^4.7.45",
     "@types/node": "^9.6.47",

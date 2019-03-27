@@ -1,10 +1,10 @@
-import { strict as assert} from 'assert'
-import mongoose from 'mongoose';
-import mongoClient from '../../mongo'
-import { createString } from '../../utils/test'
-import ProjectFeedback from '../../models/ProjectFeedback'
+import assert from 'assert'
+import mongoose from 'mongoose'
+import mongoClient from '../../src/mongo'
+import { createString } from '../utils/test'
+import ProjectFeedback from '../../src/models/ProjectFeedback'
 
-const newProjectFeedbackProperties = () => {
+const newProjectFeedbackProperties = (): any => {
   return {
     user: new mongoose.Types.ObjectId(),
     project: new mongoose.Types.ObjectId(),
@@ -28,7 +28,7 @@ const newProjectFeedbackCommentProperties = () => {
 }
 
 before(async () => mongoClient.connect())
-afterEach(async () => ProjectFeedback.deleteMany())
+afterEach(async () => ProjectFeedback.deleteMany({}))
 after(async () => mongoClient.disconnect())
 
 describe('ProjectFeedback', function () {
@@ -37,20 +37,24 @@ describe('ProjectFeedback', function () {
   })
 
   it('should throw an invalid content ValidatorError', async () => {
-    await assert.rejects(createProjectFeedback({...newProjectFeedbackProperties(), content: 'ts'}).validate())
+    // @ts-ignore
+    await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), content: 'ts' }).validate())
   })
 
   describe('ProjectFeedbackComment', function () {
     it('should save a new record', async () => {
-      assert(await createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [newProjectFeedbackCommentProperties()]}).save())
+      // @ts-ignore
+      assert(await createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [newProjectFeedbackCommentProperties()] }).save())
     })
-    
+
     it('should throw a comment type error', async () => {
-      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: ''}).validate())
+      // @ts-ignore
+      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: '' }).validate())
     })
-    
+
     it('should throw a invalid content ValidationError', async () => {
-      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [{...newProjectFeedbackCommentProperties(), content: 'ts'}]}).save())
+      // @ts-ignore
+      await assert.rejects(createProjectFeedback({ ...newProjectFeedbackProperties(), comments: [{ ...newProjectFeedbackCommentProperties(), content: 'ts' }] }).save())
     })
   })
 })

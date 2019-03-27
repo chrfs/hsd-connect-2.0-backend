@@ -2,17 +2,11 @@
 {
     "search.exclude": {
         "**/node_modules": true,
-        "**/bower_components": true,
         "**/dist": true,
         "**/coverge": true
     },
     "typescript.referencesCodeLens.enabled": true,
     "tslint.ignoreDefinitionFiles": false,
     "tslint.autoFixOnSave": true,
-    "tslint.exclude": "**/node_modules/**/*",
-    "cSpell.words": [
-        "csrf",
-        "definitelytyped",
-        "promisified"
-    ]
+    "tslint.exclude": ["**/node_modules/**/*"],
 }

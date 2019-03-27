@@ -1,8 +1,8 @@
-import { strict as assert} from 'assert'
-import mongoose from 'mongoose';
-import mongoClient from '../../mongo'
-import { createString } from '../../utils/test'
-import ProjectGroup from '../../models/ProjectGroup'
+import assert from 'assert'
+import mongoose from 'mongoose'
+import mongoClient from '../../src/mongo'
+import { createString } from '../utils/test'
+import ProjectGroup from '../../src/models/ProjectGroup'
 
 const newProjectGroupProperties = () => {
   return {
@@ -14,7 +14,7 @@ const newProjectGroupProperties = () => {
   }
 }
 
-export const createProjectGroup = (projectGroupProperties = newProjectGroupProperties()) => {
+export const createProjectGroup = (projectGroupProperties: any = newProjectGroupProperties()): any => {
   return (new ProjectGroup(projectGroupProperties)).save()
 }
 
@@ -26,7 +26,7 @@ const newProjectGroupMessageProperties = () => {
 }
 
 before(async () => mongoClient.connect())
-afterEach(async () => ProjectGroup.deleteMany())
+afterEach(async () => ProjectGroup.deleteMany({}))
 after(async () => mongoClient.disconnect())
 
 describe('ProjectGroup', function () {
@@ -36,11 +36,12 @@ describe('ProjectGroup', function () {
 
   describe('ProjectGroupMessage', function () {
     it('should save a new record', async () => {
-      assert(await createProjectGroup({ ...newProjectGroupProperties(), messages: [newProjectGroupMessageProperties()]}))
+      assert(await createProjectGroup({ ...newProjectGroupProperties(), messages: [newProjectGroupMessageProperties()] }))
     })
-    
+
     it('should throw a type ValidationError', async () => {
-      await assert.rejects(createProjectGroup({ ...newProjectGroupProperties(), messages: ''}))
+      // @ts-ignore
+      await assert.rejects(createProjectGroup({ ...newProjectGroupProperties(), messages: '' }))
     })
   })
 })
