@@ -101,3 +101,4 @@ dist
 ### Custom
 config/env*.mjs
 config/!env.example.mjs
+.DS_STORE
