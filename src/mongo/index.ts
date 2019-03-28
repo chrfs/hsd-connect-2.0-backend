@@ -26,10 +26,10 @@ mongo.connect = async () => {
       useNewUrlParser: true,
       useCreateIndex: true
     }
-    await mongoose.connect(
+    await (mongoose.connect(
       `${env.MONGO.HOST}:${env.MONGO.PORT}/${env.MONGO.DATABASE}`,
       mongooseOptions
-    )
+    ) as any)
   } catch (err) {
     throw err
   }

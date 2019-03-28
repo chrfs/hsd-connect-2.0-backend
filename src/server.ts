@@ -9,8 +9,7 @@ import api from './routes'
 import responseFormatter from './utils/responseFormatter'
 import logger from './utils/logger'
 
-const app = new Koa()
-
+const app: any = new Koa()
 mongoClient.connect()
 if (env.TYPE === 'development') app.use(cors())
 app.listen(env.API.PORT)

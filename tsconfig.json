@@ -13,8 +13,11 @@
       "*": ["node_modules/*", "src/types/*"]
     }
   },
-  "include": ["src/**/*", "src/config/.env.ts"],
+  "include": ["src/**/*"],
   "exclude": [
     "src/**/*.spec.ts"
-  ]
+  ],
+  "rules": {
+    "await-promise": true
+  }
 }

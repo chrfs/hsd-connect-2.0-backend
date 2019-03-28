@@ -30,7 +30,7 @@ const createProject = (projectProperties: any) => {
 router.get('/:projectId/images/:imageToken', async (ctx: any) => {
   try {
     const { projectId, imageToken } = ctx.params
-    const project: ProjectInterface = (await Project.findOne({ _id: projectId, 'images.token': imageToken }).select('images'))
+    const project: ProjectInterface = (await Project.findOne({ _id: projectId, 'images.token': imageToken }).select('images') as any)
     const image = project.images.find(image => image.token === imageToken)
     const imagePath = image ? image.path + image.name : null
     if (!fs.existsSync(imagePath)) {
@@ -54,7 +54,7 @@ router.get('/', async (ctx: any) => {
       path: 'user',
       model: 'User',
       select: 'firstname lastname'
-    }).select('-images.path')
+    }).select('-images.path') as any
     ctx.body = projects
   } catch (err) {
     throw err
@@ -74,7 +74,7 @@ router.get('/:projectId', async (ctx: any) => {
     path: 'members',
     model: 'User',
     select: 'firstname lastname image'
-  }).select('-images.path')).toObject()
+  }).select('-images.path')).toObject() as any
   project.feedback = await ProjectFeedback.find({ project: ctx.params.projectId }).populate({
     path: 'user',
     model: 'User',
@@ -83,7 +83,7 @@ router.get('/:projectId', async (ctx: any) => {
     path: 'comments.user',
     model: 'User',
     select: 'firstname lastname image optionalInformation'
-  })
+  }) as any
   ctx.body = project
 })
 
@@ -138,7 +138,7 @@ router.put('/:projectId', async (ctx: any) => {
       return !updatedProject.images.some((img2) => img1.name === img2.name)
     })
     await Promise.all(deletedImages.map(async (image: ImageInterface) => {
-      await deleteFile((image.path + image.name))
+      await (deleteFile((image.path + image.name)) as any)
     }))
   } catch (err) {
     throw err
