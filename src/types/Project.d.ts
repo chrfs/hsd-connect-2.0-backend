@@ -5,9 +5,9 @@ import { Document } from 'mongoose'
 export interface ProjectFeedbackInterface extends Document {
   project?: string
   user?: string
-  likedBy?: string[]
+  likedBy: string[]
   content?: string
-  comments?: ProjectFeedbackCommentInterface[]
+  comments: ProjectFeedbackCommentInterface[]
   createdAt?: Date
   updatedAt?: Date
 }
@@ -24,7 +24,7 @@ export interface ProjectInterface extends Document {
   title?: string
   description?: string
   images?: ImageInterface[]
-  likedBy?: string[]
+  likedBy: string[]
   members?: string[]
   searchingParticipants?: boolean
   isActive?: boolean

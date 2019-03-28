@@ -10,10 +10,10 @@
   "license": "MIT",
   "scripts": {
     "start:prod": "node dist/server.js",
-    "start:dev": "NODE_ENV='development' concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc -w --skipLibCheck\" \"nodemon dist/server.js\"",
-    "build": "NODE_ENV='production' tsc --skipLibCheck",
+    "start:dev": "NODE_ENV='development' concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"tsc -w --skipLibCheck\" \"nodemon dist/server.js\"",
+    "build": "NODE_ENV='production' tsc --skipLibCheck && npm run tslint",
     "lint:stage": "npm run prettier && npm run tslint && npm run unit:test",
-    "tslint": "tslint -p tsconfig.json -c tsconfig.json",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
     "prettier": "prettier-standard \"./src/**/*.ts\"",
     "unit:test": "NODE_ENV=test mocha --require ts-node/register test/**/*.spec.ts --exit"
   },

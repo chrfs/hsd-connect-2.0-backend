@@ -30,17 +30,18 @@ const createProject = (projectProperties: any) => {
 router.get('/:projectId/images/:imageToken', async (ctx: any) => {
   try {
     const { projectId, imageToken } = ctx.params
-    const project: ProjectInterface = (await Promise.resolve(Project.findOne({ _id: projectId, 'images.token': imageToken }).select(
+    const project: ProjectInterface = await Promise.resolve(Project.findOne({ _id: projectId, 'images.token': imageToken }).select(
       'images'
-    ) as any)) as any
-    const image = project.images.find(image => image.token === imageToken)
+    ) as any)
+    const image = project.images ? project.images.find(image => image.token === imageToken) : null
     const imagePath = image ? image.path + image.name : null
-    if (!fs.existsSync(imagePath)) {
+    if (!imagePath || !fs.existsSync(imagePath || './fakepath')) {
       ctx.status = 404
       return
     }
     ctx.body = fs.readFileSync(imagePath)
-    ctx.set('Content-Type', fileType(ctx.body).mime)
+    const imageType = fileType(ctx.body)
+    ctx.set('Content-Type', imageType ? imageType.mime : 'application/json')
     ctx.set('Cache-Control', 'max-age=3600')
     ctx.state.formatResponse = false
   } catch (err) {
@@ -52,14 +53,13 @@ router.use(authorization)
 
 router.get('/', async (ctx: any) => {
   try {
-    const projects = (await Promise.resolve(Project.find()
+    ctx.body = await Promise.resolve(Project.find()
       .populate({
         path: 'user',
         model: 'User',
         select: 'firstname lastname'
       })
-      .select('-images.path') as any)) as any
-    ctx.body = projects
+      .select('-images.path') as any)
   } catch (err) {
     throw err
   }
@@ -81,8 +81,8 @@ router.get('/:projectId', async (ctx: any) => {
       model: 'User',
       select: 'firstname lastname image'
     })
-    .select('-images.path') as any)).toObject() as any
-  project.feedback = (await Promise.resolve(ProjectFeedback.find({ project: ctx.params.projectId })
+    .select('-images.path') as any)).toObject()
+  project.feedback = await Promise.resolve(ProjectFeedback.find({ project: ctx.params.projectId })
     .populate({
       path: 'user',
       model: 'User',
@@ -92,7 +92,7 @@ router.get('/:projectId', async (ctx: any) => {
       path: 'comments.user',
       model: 'User',
       select: 'firstname lastname image optionalInformation'
-    }) as any)) as any
+    }) as any)
   ctx.body = project
 })
 
@@ -105,7 +105,7 @@ router.post('/', async (ctx: any) => {
     }
     const projectProperties = ctx.request.fields
     projectProperties.user = ctx.state.user._id
-    const newProject: ProjectInterface = await createProject(projectProperties)
+    const newProject = (await createProject(projectProperties)) as ProjectInterface
     const parsedImages = await parse.images(projectProperties.images, 1000)
     newProject.images = parsedImages.files
     await newProject.validate()
@@ -129,14 +129,14 @@ router.put('/:projectId', async (ctx: any) => {
     project.images = ctx.request.fields.images
     project.searchingParticipants = ctx.request.fields.searchingParticipants
     const receivedImages = ctx.request.fields.images.map((image: ImageInterface) => {
-      if (!image._id || !Number.isFinite(image.orderNo)) {
+      if (!image._id || !Number.isFinite(image.orderNo ? image.orderNo : 0)) {
         return image
       }
       const previousImage = previousImages.find((img: ImageInterface) => img._id === image._id)
       if (!previousImage) {
         return
       }
-      return { ...previousImage, orderNo: +image.orderNo }
+      return { ...previousImage, orderNo: +(image.orderNo ? image.orderNo : 0) }
     })
     const parsedImages = await parse.images(receivedImages, 1000)
     project.images = parsedImages.files
@@ -144,7 +144,7 @@ router.put('/:projectId', async (ctx: any) => {
     await saveFiles.images(parsedImages.saveDir, parsedImages.files)
     const updatedProject = await project.save()
     const deletedImages = previousImages.filter((img1: ImageInterface) => {
-      return !updatedProject.images.some(img2 => img1.name === img2.name)
+      return updatedProject && updatedProject.images && !updatedProject.images.some(img2 => img1.name === img2.name)
     })
     await Promise.all(
       deletedImages.map(async (image: ImageInterface) => {
@@ -184,6 +184,9 @@ router.post('/:projectId/feedback/:feedbackId/comment', async (ctx: any) => {
   try {
     const { comment } = ctx.request.fields
     const projectFeedback: ProjectFeedbackInterface = await Promise.resolve(ProjectFeedback.findOne({ _id: ctx.params.feedbackId }) as any)
+    if (!projectFeedback) {
+      ctx.status = 404
+    }
     comment.user = ctx.state.user._id
     projectFeedback.comments.push(comment)
     await projectFeedback.validate()

@@ -14,10 +14,5 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "src/**/*.spec.ts"
-  ],
-  "rules": {
-    "await-promise": [true, "Bluebird"]
-  }
+  "exclude": ["src/**/*.spec.ts"]
 }

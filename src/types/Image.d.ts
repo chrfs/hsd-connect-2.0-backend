@@ -5,7 +5,7 @@ export interface ImageInterface extends mongoose.Document {
   size: number
   mime: string
   path: string
-  orderNo?: number
+  orderNo?: number | undefined
   isActive?: boolean
   createdAt: Date
 }
