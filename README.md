@@ -33,7 +33,7 @@ The architecture is splitted into two seperate parts, this is the API and builds
 
 #### Authentification
 
-Authentification is based on JWT. Authentication required route are behind an `ensureAuthentification` midleware which checks the jwt `authToken` reveiced in the request header as Barer-Authorization: `Authorization: barer <authToken>`.
+Authentification is based on JWT. Authentication required route are behind an `ensureAuthentification` midleware which checks the jwt `authToken` received in the request header using Bearer-Authorization: `Authorization: Bearer <authToken>`.
 
 #### Documentation
 
