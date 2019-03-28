@@ -27,7 +27,7 @@ The architecture is splitted into two seperate parts, this is the API and builds
 | `start:dev`  | Is only for development purposes and starts nodemon with typescript in watch mode.                        |
 | `unit:test`  | Runs the mocha unit tests                                                                                 |
 | `prettier`   | Runs prettier with standardjs configured                                                                  |
-| `test`       | Runs tests using Jest test runner                                                                         |
+| `test`       | Runs tests using Mocha as test runner                                                                     |
 | `tslint`     | Runs tslint with the `tsconfig.json` and `tslint.json` configs                                            |
 | `lint:stage` | Configured with a git hook on commit and starts `prettier`, `tslint` and `unit:test` scripts              |
 
