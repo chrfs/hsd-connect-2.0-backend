@@ -68,9 +68,9 @@ router.post('/auth', async (ctx: any) => {
       ctx.body = 'Please enter your email and password to authenticate.'
       return
     }
-    const user: UserNamespace.UserInterface = await User.findOne({ email }).select(
+    const user: UserNamespace.UserInterface = await Promise.resolve(User.findOne({ email }).select(
       '_id firstname lastname email password bookmarkedProjects settings'
-    )
+    ) as any)
     const authStatus = await authenticateUser(password, user)
     if (!authStatus) {
       ctx.body = 'Authentification failed, please check your credentials'
@@ -93,9 +93,9 @@ router.get('/:userId', async (ctx: any) => {
       ctx.status = 401
       return
     }
-    const user = await User.findOne({ _id: ctx.params.userId }).select(
+    const user = await Promise.resolve(User.findOne({ _id: ctx.params.userId }).select(
       '_id firstname lastname email bookmarkedProjects settings'
-    )
+    ) as any)
     ctx.body = { user }
   } catch (err) {
     throw err
@@ -108,8 +108,8 @@ router.put('/:userId/bookmark/:projectId', async (ctx: any) => {
       ctx.status = 401
       return
     }
-    const user = await User.findOne({ _id: ctx.params.userId })
-    const project: ProjectInterface = await Project.findOne({ _id: ctx.params.projectId })
+    const user = await Promise.resolve(User.findOne({ _id: ctx.params.userId }) as any)
+    const project: ProjectInterface = await Promise.resolve(Project.findOne({ _id: ctx.params.projectId }) as any)
     if (!user || !project) {
       ctx.status = 404
       return

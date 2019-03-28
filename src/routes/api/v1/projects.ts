@@ -30,7 +30,9 @@ const createProject = (projectProperties: any) => {
 router.get('/:projectId/images/:imageToken', async (ctx: any) => {
   try {
     const { projectId, imageToken } = ctx.params
-    const project: ProjectInterface = (await Project.findOne({ _id: projectId, 'images.token': imageToken }).select('images') as any)
+    const project: ProjectInterface = (await Promise.resolve(Project.findOne({ _id: projectId, 'images.token': imageToken }).select(
+      'images'
+    ) as any)) as any
     const image = project.images.find(image => image.token === imageToken)
     const imagePath = image ? image.path + image.name : null
     if (!fs.existsSync(imagePath)) {
@@ -50,11 +52,13 @@ router.use(authorization)
 
 router.get('/', async (ctx: any) => {
   try {
-    const projects = await Project.find().populate({
-      path: 'user',
-      model: 'User',
-      select: 'firstname lastname'
-    }).select('-images.path') as any
+    const projects = (await Promise.resolve(Project.find()
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: 'firstname lastname'
+      })
+      .select('-images.path') as any)) as any
     ctx.body = projects
   } catch (err) {
     throw err
@@ -66,24 +70,29 @@ router.get('/:projectId', async (ctx: any) => {
     ctx.status = 404
     return
   }
-  const project = (await Project.findOne({ _id: ctx.params.projectId }).populate({
-    path: 'user',
-    model: 'User',
-    select: 'firstname lastname image'
-  }).populate({
-    path: 'members',
-    model: 'User',
-    select: 'firstname lastname image'
-  }).select('-images.path')).toObject() as any
-  project.feedback = await ProjectFeedback.find({ project: ctx.params.projectId }).populate({
-    path: 'user',
-    model: 'User',
-    select: 'firstname lastname image optionalInformation'
-  }).populate({
-    path: 'comments.user',
-    model: 'User',
-    select: 'firstname lastname image optionalInformation'
-  }) as any
+  const project = (await Promise.resolve(Project.findOne({ _id: ctx.params.projectId })
+    .populate({
+      path: 'user',
+      model: 'User',
+      select: 'firstname lastname image'
+    })
+    .populate({
+      path: 'members',
+      model: 'User',
+      select: 'firstname lastname image'
+    })
+    .select('-images.path') as any)).toObject() as any
+  project.feedback = (await Promise.resolve(ProjectFeedback.find({ project: ctx.params.projectId })
+    .populate({
+      path: 'user',
+      model: 'User',
+      select: 'firstname lastname image optionalInformation'
+    })
+    .populate({
+      path: 'comments.user',
+      model: 'User',
+      select: 'firstname lastname image optionalInformation'
+    }) as any)) as any
   ctx.body = project
 })
 
@@ -109,7 +118,7 @@ router.post('/', async (ctx: any) => {
 
 router.put('/:projectId', async (ctx: any) => {
   try {
-    const project: ProjectInterface = await Project.findOne({ _id: ctx.params.projectId })
+    const project: ProjectInterface = await Promise.resolve(Project.findOne({ _id: ctx.params.projectId }) as any)
     const previousImages = JSON.parse(JSON.stringify(project.images || []))
     if (!project.user._id.equals(ctx.state.user._id)) {
       ctx.status = 401
@@ -135,11 +144,13 @@ router.put('/:projectId', async (ctx: any) => {
     await saveFiles.images(parsedImages.saveDir, parsedImages.files)
     const updatedProject = await project.save()
     const deletedImages = previousImages.filter((img1: ImageInterface) => {
-      return !updatedProject.images.some((img2) => img1.name === img2.name)
+      return !updatedProject.images.some(img2 => img1.name === img2.name)
     })
-    await Promise.all(deletedImages.map(async (image: ImageInterface) => {
-      await (deleteFile((image.path + image.name)) as any)
-    }))
+    await Promise.all(
+      deletedImages.map(async (image: ImageInterface) => {
+        await (deleteFile(image.path + image.name) as any)
+      })
+    )
   } catch (err) {
     throw err
   }
@@ -153,15 +164,17 @@ router.post('/:projectId/feedback', async (ctx: any) => {
       project: ctx.params.projectId,
       user: ctx.state.user._id
     })).save())._id
-    ctx.body = await ProjectFeedback.findOne({ _id: projectfeedbackId }).populate({
-      path: 'user',
-      model: 'User',
-      select: 'firstname lastname image optionalInformation'
-    }).populate({
-      path: 'comments.user',
-      model: 'User',
-      select: 'firstname lastname image optionalInformation'
-    })
+    ctx.body = await Promise.resolve(ProjectFeedback.findOne({ _id: projectfeedbackId })
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: 'firstname lastname image optionalInformation'
+      })
+      .populate({
+        path: 'comments.user',
+        model: 'User',
+        select: 'firstname lastname image optionalInformation'
+      }) as any)
   } catch (err) {
     throw err
   }
@@ -170,20 +183,22 @@ router.post('/:projectId/feedback', async (ctx: any) => {
 router.post('/:projectId/feedback/:feedbackId/comment', async (ctx: any) => {
   try {
     const { comment } = ctx.request.fields
-    const projectFeedback: ProjectFeedbackInterface = await ProjectFeedback.findOne({ _id: ctx.params.feedbackId })
+    const projectFeedback: ProjectFeedbackInterface = await Promise.resolve(ProjectFeedback.findOne({ _id: ctx.params.feedbackId }) as any)
     comment.user = ctx.state.user._id
     projectFeedback.comments.push(comment)
     await projectFeedback.validate()
     await projectFeedback.save()
-    ctx.body = await ProjectFeedback.findOne({ _id: ctx.params.feedbackId }).populate({
-      path: 'user',
-      model: 'User',
-      select: 'firstname lastname image optionalInformation'
-    }).populate({
-      path: 'comments.user',
-      model: 'User',
-      select: 'firstname lastname image optionalInformation'
-    })
+    ctx.body = await Promise.resolve(ProjectFeedback.findOne({ _id: ctx.params.feedbackId })
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: 'firstname lastname image optionalInformation'
+      })
+      .populate({
+        path: 'comments.user',
+        model: 'User',
+        select: 'firstname lastname image optionalInformation'
+      }) as any)
   } catch (err) {
     throw err
   }
@@ -191,7 +206,10 @@ router.post('/:projectId/feedback/:feedbackId/comment', async (ctx: any) => {
 
 router.put('/:projectId/feedback/:feedbackId/like', async (ctx: any) => {
   try {
-    const projectfeedback: ProjectFeedbackInterface = await ProjectFeedback.findOne({ project: ctx.params.projectId, _id: ctx.params.feedbackId })
+    const projectfeedback: ProjectFeedbackInterface = await Promise.resolve(ProjectFeedback.findOne({
+      project: ctx.params.projectId,
+      _id: ctx.params.feedbackId
+    }) as any)
     if (!projectfeedback) {
       ctx.status = 404
       return
@@ -210,7 +228,7 @@ router.put('/:projectId/feedback/:feedbackId/like', async (ctx: any) => {
 
 router.put('/:projectId/like', async (ctx: any) => {
   try {
-    const project: ProjectInterface = await Project.findOne({ _id: ctx.params.projectId })
+    const project: ProjectInterface = await Promise.resolve(Project.findOne({ _id: ctx.params.projectId }) as any)
     if (!project) {
       ctx.status = 404
       return

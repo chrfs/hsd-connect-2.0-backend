@@ -1,9 +1,5 @@
 import mongoose from 'mongoose'
-import {
-  schemaUtils,
-  schemaValidator,
-  schemaValidatorMessages
-} from '../../utils/models/schemaUtils'
+import { schemaUtils, schemaValidator, schemaValidatorMessages } from '../../utils/models/schemaUtils'
 
 const projectFeedbackCommentSchema = new mongoose.Schema({
   user: {
@@ -25,13 +21,7 @@ const projectFeedbackCommentSchema = new mongoose.Schema({
   }
 })
 
-projectFeedbackCommentSchema.pre(
-  'save',
-  schemaValidator.validateLength('content', 5, 300)
-)
-projectFeedbackCommentSchema.pre(
-  'save',
-  schemaUtils.setPropertyDate('updatedAt')
-)
+projectFeedbackCommentSchema.pre('save', schemaValidator.validateLength('content', 5, 300))
+projectFeedbackCommentSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
 
 export default projectFeedbackCommentSchema

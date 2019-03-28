@@ -1,11 +1,7 @@
 import mongoose from 'mongoose'
 import { projectValidatorErrors } from '../utils/models/projectUtils'
 import Image from './sub/Image'
-import {
-  schemaUtils,
-  schemaValidator,
-  schemaValidatorMessages
-} from '../utils/models/schemaUtils'
+import { schemaUtils, schemaValidator, schemaValidatorMessages } from '../utils/models/schemaUtils'
 import { ValidationError } from '../utils/errors'
 import { parse } from '../utils/file'
 import { ImageInterface } from 'Image'
@@ -56,16 +52,13 @@ const projectSchema = new mongoose.Schema({
   }
 })
 projectSchema.pre('validate', schemaValidator.validateLength('title', 25, 65))
-projectSchema.pre(
-  'validate',
-  schemaValidator.validateLength('description', 300, 4000)
-)
+projectSchema.pre('validate', schemaValidator.validateLength('description', 300, 4000))
 projectSchema.pre(
   'validate',
   schemaValidator.validateProperty(
     'title',
     async function (query: any) {
-      return !(await Project.find(query)).length
+      return !(await Promise.resolve(Project.find(query) as any)).length
     },
     projectValidatorErrors.uniqueTitle
   )
@@ -80,7 +73,7 @@ projectSchema.pre('validate', function (next) {
 
 projectSchema.pre('validate', function (next) {
   this.images = Array.isArray(this.images) ? this.images : []
-  const isValid = parse.fileArrSize(this.images) <= 3e+6
+  const isValid = parse.fileArrSize(this.images) <= 3e6
   if (!isValid) {
     throw ValidationError('images', `The total size of your images is to big! `)
   }

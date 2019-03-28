@@ -18,6 +18,6 @@
     "src/**/*.spec.ts"
   ],
   "rules": {
-    "await-promise": true
+    "await-promise": [true, "Bluebird"]
   }
 }

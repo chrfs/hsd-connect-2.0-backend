@@ -10,11 +10,7 @@ mongoose.connection.on('error', err => {
 
 mongoose.connection.once('open', () => {
   logger.info('Database connection is established')
-  logger.info(
-    `API is up running at http://${env.API.HOST}:${env.API.PORT}${
-      env.API.PATH
-    }/`
-  )
+  logger.info(`API is up running at http://${env.API.HOST}:${env.API.PORT}${env.API.PATH}/`)
 })
 
 mongo.connect = async () => {
@@ -26,10 +22,7 @@ mongo.connect = async () => {
       useNewUrlParser: true,
       useCreateIndex: true
     }
-    await (mongoose.connect(
-      `${env.MONGO.HOST}:${env.MONGO.PORT}/${env.MONGO.DATABASE}`,
-      mongooseOptions
-    ) as any)
+    await (mongoose.connect(`${env.MONGO.HOST}:${env.MONGO.PORT}/${env.MONGO.DATABASE}`, mongooseOptions) as any)
   } catch (err) {
     throw err
   }

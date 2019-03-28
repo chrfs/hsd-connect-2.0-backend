@@ -9,18 +9,13 @@
   "author": "Abdelmoez Cherif <a.cherif@me.com>",
   "license": "MIT",
   "scripts": {
-    "start": "npm run serve",
-    "build": "NODE_ENV='production' npm run build-ts",
-    "serve": "node dist/server.js",
-    "watch-node": "nodemon dist/server.js",
-    "watch": "NODE_ENV='development' concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
-    "test": "NODE_ENV=test mocha --require ts-node/register test/**/*.spec.ts",
-    "build-ts": "tsc --skipLibCheck",
-    "watch-ts": "tsc -w --skipLibCheck",
-    "tslint": "tslint -p tsconfig.json",
-    "debug": "npm run build && npm run watch-debug",
-    "serve-debug": "NODE_ENV='development' nodemon --inspect dist/server.js",
-    "watch-debug": "NODE_ENV='development' concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+    "start:prod": "node dist/server.js",
+    "start:dev": "NODE_ENV='development' concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"tsc -w --skipLibCheck\" \"nodemon dist/server.js\"",
+    "build": "NODE_ENV='production' tsc --skipLibCheck",
+    "lint:stage": "npm run prettier && npm run tslint && npm run unit:test",
+    "tslint": "tslint -p tsconfig.json -c tsconfig.json",
+    "prettier": "prettier-standard \"./src/**/*.ts\"",
+    "unit:test": "NODE_ENV=test mocha --require ts-node/register test/**/*.spec.ts --exit"
   },
   "dependencies": {
     "@koa/cors": "^2.2.3",
@@ -39,7 +34,6 @@
     "koa-router": "^7.4.0",
     "mkdirp": "^0.5.1",
     "mongoose": "^5.4.20",
-    "sharp": "^0.21.3",
     "uuid": "^3.3.2",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^3.8.0"
@@ -61,13 +55,18 @@
     "@types/uuid": "^3.4.4",
     "@types/winston": "^2.4.4",
     "concurrently": "^3.6.1",
+    "husky": "^1.3.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.10",
     "prettier-standard": "^8.0.1",
-    "standard": "^11.0.1",
     "ts-node": "^5.0.1",
     "tslint": "^5.14.0",
     "tslint-config-standard": "^8.0.1",
     "typescript": "^2.9.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint:stage"
+    }
   }
 }

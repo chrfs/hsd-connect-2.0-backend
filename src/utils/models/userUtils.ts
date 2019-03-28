@@ -9,12 +9,7 @@ export const userValidator = {
     const regExp = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i // eslint-disable-line
     const suffix = ['@study.hs-duesseldorf.de']
     const isValid =
-      regExp.test(this.email) &&
-      suffix.some(suffix =>
-        new RegExp(`${suffix}$`).test(
-          this.email.toLowerCase().replace(/\s/g, '')
-        )
-      )
+      regExp.test(this.email) && suffix.some(suffix => new RegExp(`${suffix}$`).test(this.email.toLowerCase().replace(/\s/g, '')))
     if (!isValid) throw userValidationErrors.invalidEmail
     this.email = this.email.toLowerCase()
     return next()
@@ -23,10 +18,7 @@ export const userValidator = {
     try {
       if (!this.isNew && !this.isModified('password')) return next()
       const regExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#%&])(?=.{8,32})/
-      const isValid =
-        regExp.test(this.password) &&
-        this.password.length >= 8 &&
-        this.password.length <= 32
+      const isValid = regExp.test(this.password) && this.password.length >= 8 && this.password.length <= 32
       if (!isValid) throw userValidationErrors.invalidPassword
       return next()
     } catch (err) {
@@ -50,10 +42,8 @@ export const userRecordUtils = {
 
     this.firstname = emailPrefixSplitted[0]
     this.lastname = emailPrefixSplitted[1]
-    this.firstname =
-      this.firstname.charAt(0).toUpperCase() + this.firstname.slice(1)
-    this.lastname =
-      this.lastname.charAt(0).toUpperCase() + this.lastname.slice(1)
+    this.firstname = this.firstname.charAt(0).toUpperCase() + this.firstname.slice(1)
+    this.lastname = this.lastname.charAt(0).toUpperCase() + this.lastname.slice(1)
     if (!this.firstname || !this.lastname) {
       throw userValidationErrors.invalidEmail
     }
@@ -76,12 +66,6 @@ export const userValidationErrors = {
     'password',
     'Your password has to contain an upper- & lowercase letter, a number, a special character (!@#%&) and have a length between 8 and 32 characters.'
   ),
-  invalidEmail: ValidationError(
-    'email',
-    'Please use your hsd university e-mail address.'
-  ),
-  uniqueEmail: ValidationError(
-    'email',
-    'An user with this e-mail already exists.'
-  )
+  invalidEmail: ValidationError('email', 'Please use your hsd university e-mail address.'),
+  uniqueEmail: ValidationError('email', 'An user with this e-mail already exists.')
 }

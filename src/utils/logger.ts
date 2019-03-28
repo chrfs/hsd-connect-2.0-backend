@@ -25,9 +25,7 @@ const winstonConfiguration = {
       format: 'YYYY-MM-DD HH:mm:ss'
     }),
     winston.format.json(),
-    winston.format.printf(
-      info => `${info.timestamp} ${info.level}: ${flatted.stringify(info.message)}`
-    )
+    winston.format.printf(info => `${info.timestamp} ${info.level}: ${flatted.stringify(info.message)}`)
   ),
   transports: [
     new winston.transports.Console({
@@ -35,10 +33,7 @@ const winstonConfiguration = {
       level: env.WINSTON.LOG_LEVEL || 'info'
     }),
     new WinstonDailyRotateFile({
-      filename: path.join(
-        env.WINSTON.LOG_DIR,
-        `/${env.WINSTON.LOG_LEVEL}-%DATE%.log`
-      ),
+      filename: path.join(env.WINSTON.LOG_DIR, `/${env.WINSTON.LOG_LEVEL}-%DATE%.log`),
       ...winstonTransportProperties,
       level: env.WINSTON.LOG_LEVEL
     }),

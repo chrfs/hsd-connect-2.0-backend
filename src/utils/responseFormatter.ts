@@ -17,13 +17,10 @@ responseFormatter.send = (ctx: any, err: Error) => {
 }
 
 responseFormatter.formatValidationErrors = (validationErrors: any) => {
-  const formattedResponse = Object.keys(validationErrors.errors).reduce(
-    (errorsAcc: any, field: string) => {
-      errorsAcc[field] = validationErrors.errors[field].message
-      return errorsAcc
-    },
-    {}
-  )
+  const formattedResponse = Object.keys(validationErrors.errors).reduce((errorsAcc: any, field: string) => {
+    errorsAcc[field] = validationErrors.errors[field].message
+    return errorsAcc
+  }, {})
   return formattedResponse
 }
 

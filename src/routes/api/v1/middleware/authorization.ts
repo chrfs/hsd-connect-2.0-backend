@@ -8,10 +8,7 @@ export default async (ctx: any, next: any) => {
       ctx.status = 401
       return
     }
-    const authorization: any = jwt.verify(
-      ctx.request.header.authorization,
-      env.JWT.SECRET
-    )
+    const authorization: any = jwt.verify(ctx.request.header.authorization, env.JWT.SECRET)
     if (!authorization) {
       ctx.status = 401
       return
