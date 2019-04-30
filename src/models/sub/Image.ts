@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
-import uuidv4 from 'uuid/v4'
-import { schemaValidator } from '../../utils/models/schemaUtils'
+import mongoose from "mongoose";
+import uuidv4 from "uuid/v4";
+import { schemaValidator } from "../../utils/models/schemaUtils";
 
 const imageSchema = new mongoose.Schema(
   {
@@ -13,7 +13,7 @@ const imageSchema = new mongoose.Schema(
       required: true
     },
     token: {
-      type: mongoose.Schema.Types.String
+      type: mongoose.Schema.Types.String,
     },
     size: {
       type: mongoose.Schema.Types.Number,
@@ -41,12 +41,12 @@ const imageSchema = new mongoose.Schema(
     toObject: { virtuals: true },
     toJSON: { virtuals: true }
   }
-)
+);
 
-imageSchema.pre('save', schemaValidator.validateLength('name', 5, 22))
-imageSchema.pre('save', function (next) {
-  this.token = uuidv4()
-  next()
-})
+imageSchema.pre("save", schemaValidator.validateLength("name", 5, 22));
+imageSchema.pre("save", function(next) {
+  this.token = uuidv4();
+  next();
+});
 
-export default imageSchema
+export default imageSchema;

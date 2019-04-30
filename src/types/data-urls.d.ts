@@ -1,1 +1,1 @@
-declare module 'data-urls'
+declare module "data-urls";

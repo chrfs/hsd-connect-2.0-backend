@@ -1,16 +1,16 @@
-import mongoose from 'mongoose'
-import { schemaUtils } from '../utils/models/schemaUtils'
-import ProjectGroupMessage from './sub/ProjectGroupMessage'
+import mongoose from "mongoose";
+import { schemaUtils } from "../utils/models/schemaUtils";
+import ProjectGroupMessage from "./sub/ProjectGroupMessage";
 
 const projectGroupSchema = new mongoose.Schema({
   project: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Projects',
+    ref: "Projects",
     required: true
   },
   members: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Users',
+    ref: "Users",
     required: true,
     default: []
   },
@@ -26,10 +26,10 @@ const projectGroupSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
-})
+});
 
-projectGroupSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
+projectGroupSchema.pre("validate", schemaUtils.setPropertyDate("updatedAt"));
 
-const ProjectGroup = mongoose.model('ProjectGroup', projectGroupSchema)
+const ProjectGroup = mongoose.model("ProjectGroup", projectGroupSchema);
 
-export default ProjectGroup
+export default ProjectGroup;

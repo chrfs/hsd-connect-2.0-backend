@@ -1,10 +1,10 @@
-import KoaRouter from 'koa-router'
-import users from './users'
-import projects from './projects'
+import KoaRouter from "koa-router";
+import projects from "./projects";
+import users from "./users";
 
-const router = new KoaRouter()
+const router = new KoaRouter();
 
-router.use(users.routes()) // uses authorization within
-router.use(projects.routes())
+router.use(users.routes()); // uses authorization within
+router.use(projects.routes());
 
-export default router
+export default router;

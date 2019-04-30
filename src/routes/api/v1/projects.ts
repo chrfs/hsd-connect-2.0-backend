@@ -1,17 +1,20 @@
-import KoaRouter from 'koa-router'
-import fileType from 'file-type'
-import Project from '../../../models/Project'
-import ProjectFeedback from '../../../models/ProjectFeedback'
-import fs from 'fs'
-import authorization from './middleware/authorization'
-import { parse, saveFiles, deleteFile } from '../../../utils/file'
-import mongoose from 'mongoose'
-import { ProjectInterface, ProjectFeedbackInterface } from '../../../types/Project'
-import { ImageInterface } from 'Image'
+import fileType from "file-type";
+import fs from "fs";
+import { ImageInterface } from "Image";
+import KoaRouter from "koa-router";
+import mongoose from "mongoose";
+import Project from "../../../models/Project";
+import ProjectFeedback from "../../../models/ProjectFeedback";
+import {
+  ProjectFeedbackInterface,
+  ProjectInterface
+} from "../../../types/Project";
+import { deleteFile, parse, saveFiles } from "../../../utils/file";
+import authorization from "./middleware/authorization";
 
 const router = new KoaRouter({
-  prefix: '/projects'
-})
+  prefix: "/projects"
+});
 
 const createProject = (projectProperties: any) => {
   try {
@@ -21,231 +24,258 @@ const createProject = (projectProperties: any) => {
       description: projectProperties.description,
       images: projectProperties.images,
       searchingParticipants: projectProperties.searchingParticipants
-    })
+    });
   } catch (err) {
-    throw err
+    throw err;
   }
-}
+};
 
-router.get('/:projectId/images/:imageToken', async (ctx: any) => {
+router.get("/:projectId/images/:imageToken", async (ctx: any) => {
   try {
-    const { projectId, imageToken } = ctx.params
-    const project: ProjectInterface = await Promise.resolve(Project.findOne({ _id: projectId, 'images.token': imageToken }).select(
-      'images'
-    ) as any)
-    const image = project.images ? project.images.find(image => image.token === imageToken) : null
-    const imagePath = image ? image.path + image.name : null
-    if (!imagePath || !fs.existsSync(imagePath || './fakepath')) {
-      ctx.status = 404
-      return
+    const { projectId, imageToken } = ctx.params;
+    const project: ProjectInterface = await Promise.resolve(Project.findOne({
+      _id: projectId,
+      "images.token": imageToken
+    }).select("images") as any);
+    const image = project.images
+      ? project.images.find((img: any) => img.token === imageToken)
+      : null;
+    const imagePath = image ? image.path + image.name : null;
+    if (!imagePath || !fs.existsSync(imagePath || "./fakepath")) {
+      ctx.status = 404;
+      return;
     }
-    ctx.body = fs.readFileSync(imagePath)
-    const imageType = fileType(ctx.body)
-    ctx.set('Content-Type', imageType ? imageType.mime : 'application/json')
-    ctx.set('Cache-Control', 'max-age=3600')
-    ctx.state.formatResponse = false
+    ctx.body = fs.readFileSync(imagePath);
+    const imageType = fileType(ctx.body);
+    ctx.set("Content-Type", imageType ? imageType.mime : "application/json");
+    ctx.set("Cache-Control", "max-age=3600");
+    ctx.state.formatResponse = false;
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-router.use(authorization)
+router.use(authorization);
 
-router.get('/', async (ctx: any) => {
+router.get("/", async (ctx: any) => {
   try {
     ctx.body = await Promise.resolve(Project.find()
       .populate({
-        path: 'user',
-        model: 'User',
-        select: 'firstname lastname'
+        path: "user",
+        model: "User",
+        select: "firstname lastname"
       })
-      .select('-images.path') as any)
+      .select("-images.path") as any);
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-router.get('/:projectId', async (ctx: any) => {
+router.get("/:projectId", async (ctx: any) => {
   if (!mongoose.Types.ObjectId.isValid(ctx.params.projectId)) {
-    ctx.status = 404
-    return
+    ctx.status = 404;
+    return;
   }
-  const project = (await Promise.resolve(Project.findOne({ _id: ctx.params.projectId })
+  const project = (await Promise.resolve(Project.findOne({
+    _id: ctx.params.projectId
+  })
     .populate({
-      path: 'user',
-      model: 'User',
-      select: 'firstname lastname image'
+      path: "user",
+      model: "User",
+      select: "firstname lastname image"
     })
     .populate({
-      path: 'members',
-      model: 'User',
-      select: 'firstname lastname image'
+      path: "members",
+      model: "User",
+      select: "firstname lastname image"
     })
-    .select('-images.path') as any)).toObject()
-  project.feedback = await Promise.resolve(ProjectFeedback.find({ project: ctx.params.projectId })
+    .select("-images.path") as any)).toObject();
+  project.feedback = await Promise.resolve(ProjectFeedback.find({
+    project: ctx.params.projectId
+  })
     .populate({
-      path: 'user',
-      model: 'User',
-      select: 'firstname lastname image optionalInformation'
+      path: "user",
+      model: "User",
+      select: "firstname lastname image optionalInformation"
     })
     .populate({
-      path: 'comments.user',
-      model: 'User',
-      select: 'firstname lastname image optionalInformation'
-    }) as any)
-  ctx.body = project
-})
+      path: "comments.user",
+      model: "User",
+      select: "firstname lastname image optionalInformation"
+    }) as any);
+  ctx.body = project;
+});
 
-router.post('/', async (ctx: any) => {
+router.post("/", async (ctx: any) => {
   try {
-    const payload = ctx.request.fields
+    const payload = ctx.request.fields;
     if (!payload) {
-      ctx.status = 400
-      return
+      ctx.status = 400;
+      return;
     }
-    const projectProperties = ctx.request.fields
-    projectProperties.user = ctx.state.user._id
-    const newProject = (await createProject(projectProperties)) as ProjectInterface
-    const parsedImages = await parse.images(projectProperties.images, 1000)
-    newProject.images = parsedImages.files
-    await newProject.validate()
-    await saveFiles.images(parsedImages.saveDir, parsedImages.files)
-    ctx.body = await newProject.save()
+    const projectProperties = ctx.request.fields;
+    projectProperties.user = ctx.state.user._id;
+    const newProject = (await createProject(
+      projectProperties
+    )) as ProjectInterface;
+    const parsedImages = await parse.images(projectProperties.images, 1000);
+    newProject.images = parsedImages.files;
+    await newProject.validate();
+    await saveFiles.images(parsedImages.saveDir, parsedImages.files);
+    ctx.body = await newProject.save();
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-router.put('/:projectId', async (ctx: any) => {
+router.put("/:projectId", async (ctx: any) => {
   try {
-    const project: ProjectInterface = await Promise.resolve(Project.findOne({ _id: ctx.params.projectId }) as any)
-    const previousImages = JSON.parse(JSON.stringify(project.images || []))
+    const project: ProjectInterface = await Promise.resolve(Project.findOne({
+      _id: ctx.params.projectId
+    }) as any);
     if (!project.user._id.equals(ctx.state.user._id)) {
-      ctx.status = 401
-      return
+      ctx.status = 401;
+      return;
     }
-    project.title = ctx.request.fields.title
-    project.description = ctx.request.fields.description
-    project.images = ctx.request.fields.images
-    project.searchingParticipants = ctx.request.fields.searchingParticipants
-    const receivedImages = ctx.request.fields.images.map((image: ImageInterface) => {
-      if (!image._id || !Number.isFinite(image.orderNo ? image.orderNo : 0)) {
-        return image
-      }
-      const previousImage = previousImages.find((img: ImageInterface) => img._id === image._id)
-      if (!previousImage) {
-        return
-      }
-      return { ...previousImage, orderNo: +(image.orderNo ? image.orderNo : 0) }
-    })
-    const parsedImages = await parse.images(receivedImages, 1000)
-    project.images = parsedImages.files
-    await project.validate()
-    await saveFiles.images(parsedImages.saveDir, parsedImages.files)
-    const updatedProject = await project.save()
+    const previousImages = JSON.parse(JSON.stringify(project.images || []));
+    project.title = ctx.request.fields.title;
+    project.description = ctx.request.fields.description;
+    project.images = ctx.request.fields.images;
+    project.searchingParticipants = ctx.request.fields.searchingParticipants;
+
+    const receivedImages = ctx.request.fields.images.map(
+      (image: ImageInterface) =>
+        new Object({ orderNo: +(image.orderNo || 0), ...image })
+    );
+    const parsedImages = await parse.images(receivedImages, 1000);
+    project.images = parsedImages.files;
+
+    await project.validate();
+    await saveFiles.images(parsedImages.saveDir, parsedImages.files);
+    const updatedProject = await project.save();
+
     const deletedImages = previousImages.filter((img1: ImageInterface) => {
-      return updatedProject && updatedProject.images && !updatedProject.images.some(img2 => img1.name === img2.name)
-    })
+      return !updatedProject.images.some(img2 => img1.name === img2.name);
+    });
     await Promise.all(
       deletedImages.map(async (image: ImageInterface) => {
-        await (deleteFile(image.path + image.name) as any)
+        await (deleteFile(image.path + image.name) as any);
       })
-    )
+    );
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-router.post('/:projectId/feedback', async (ctx: any) => {
+router.post("/:projectId/feedback", async (ctx: any) => {
   try {
-    const { feedback }: any = ctx.request.fields
+    const { feedback }: any = ctx.request.fields;
     const projectfeedbackId = (await (await ProjectFeedback.create({
       content: feedback.content,
       project: ctx.params.projectId,
       user: ctx.state.user._id
-    })).save())._id
-    ctx.body = await Promise.resolve(ProjectFeedback.findOne({ _id: projectfeedbackId })
+    })).save())._id;
+    ctx.body = await Promise.resolve(ProjectFeedback.findOne({
+      _id: projectfeedbackId
+    })
       .populate({
-        path: 'user',
-        model: 'User',
-        select: 'firstname lastname image optionalInformation'
+        path: "user",
+        model: "User",
+        select: "firstname lastname image optionalInformation"
       })
       .populate({
-        path: 'comments.user',
-        model: 'User',
-        select: 'firstname lastname image optionalInformation'
-      }) as any)
+        path: "comments.user",
+        model: "User",
+        select: "firstname lastname image optionalInformation"
+      }) as any);
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-router.post('/:projectId/feedback/:feedbackId/comment', async (ctx: any) => {
+router.post("/:projectId/feedback/:feedbackId/comment", async (ctx: any) => {
   try {
-    const { comment } = ctx.request.fields
-    const projectFeedback: ProjectFeedbackInterface = await Promise.resolve(ProjectFeedback.findOne({ _id: ctx.params.feedbackId }) as any)
+    const { comment } = ctx.request.fields;
+    const projectFeedback: ProjectFeedbackInterface = await Promise.resolve(
+      ProjectFeedback.findOne({ _id: ctx.params.feedbackId }) as any
+    );
     if (!projectFeedback) {
-      ctx.status = 404
+      ctx.status = 404;
     }
-    comment.user = ctx.state.user._id
-    projectFeedback.comments.push(comment)
-    await projectFeedback.validate()
-    await projectFeedback.save()
-    ctx.body = await Promise.resolve(ProjectFeedback.findOne({ _id: ctx.params.feedbackId })
+    comment.user = ctx.state.user._id;
+    projectFeedback.comments.push(comment);
+    await projectFeedback.validate();
+    await projectFeedback.save();
+    ctx.body = await Promise.resolve(ProjectFeedback.findOne({
+      _id: ctx.params.feedbackId
+    })
       .populate({
-        path: 'user',
-        model: 'User',
-        select: 'firstname lastname image optionalInformation'
+        path: "user",
+        model: "User",
+        select: "firstname lastname image optionalInformation"
       })
       .populate({
-        path: 'comments.user',
-        model: 'User',
-        select: 'firstname lastname image optionalInformation'
-      }) as any)
+        path: "comments.user",
+        model: "User",
+        select: "firstname lastname image optionalInformation"
+      }) as any);
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-router.put('/:projectId/feedback/:feedbackId/like', async (ctx: any) => {
+router.put("/:projectId/feedback/:feedbackId/like", async (ctx: any) => {
   try {
-    const projectfeedback: ProjectFeedbackInterface = await Promise.resolve(ProjectFeedback.findOne({
-      project: ctx.params.projectId,
-      _id: ctx.params.feedbackId
-    }) as any)
+    const projectfeedback: ProjectFeedbackInterface = await Promise.resolve(
+      ProjectFeedback.findOne({
+        project: ctx.params.projectId,
+        _id: ctx.params.feedbackId
+      }) as any
+    );
     if (!projectfeedback) {
-      ctx.status = 404
-      return
+      ctx.status = 404;
+      return;
     }
-    if (projectfeedback.likedBy.some((userId: any) => userId.equals(ctx.state.user._id))) {
-      projectfeedback.likedBy.splice(projectfeedback.likedBy.indexOf(ctx.state.user._id), 1)
+    if (
+      projectfeedback.likedBy.some((userId: any) =>
+        userId.equals(ctx.state.user._id)
+      )
+    ) {
+      projectfeedback.likedBy.splice(
+        projectfeedback.likedBy.indexOf(ctx.state.user._id),
+        1
+      );
     } else {
-      projectfeedback.likedBy.push(ctx.state.user._id)
+      projectfeedback.likedBy.push(ctx.state.user._id);
     }
-    await projectfeedback.save()
-    ctx.body = { likedBy: projectfeedback.likedBy }
+    await projectfeedback.save();
+    ctx.body = { likedBy: projectfeedback.likedBy };
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-router.put('/:projectId/like', async (ctx: any) => {
+router.put("/:projectId/like", async (ctx: any) => {
   try {
-    const project: ProjectInterface = await Promise.resolve(Project.findOne({ _id: ctx.params.projectId }) as any)
+    const project: ProjectInterface = await Promise.resolve(Project.findOne({
+      _id: ctx.params.projectId
+    }) as any);
     if (!project) {
-      ctx.status = 404
-      return
+      ctx.status = 404;
+      return;
     }
-    if (project.likedBy.some((userId: any) => userId.equals(ctx.state.user._id))) {
-      project.likedBy.splice(project.likedBy.indexOf(ctx.state.user._id), 1)
+    if (
+      project.likedBy.some((userId: any) => userId.equals(ctx.state.user._id))
+    ) {
+      project.likedBy.splice(project.likedBy.indexOf(ctx.state.user._id), 1);
     } else {
-      project.likedBy.push(ctx.state.user._id)
+      project.likedBy.push(ctx.state.user._id);
     }
-    await project.save()
-    ctx.body = { likedBy: project.likedBy }
+    await project.save();
+    ctx.body = { likedBy: project.likedBy };
   } catch (err) {
-    throw err
+    throw err;
   }
-})
+});
 
-export default router
+export default router;

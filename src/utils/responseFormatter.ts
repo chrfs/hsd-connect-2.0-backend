@@ -1,6 +1,6 @@
-import env from '../config/env'
+import env from "../config/env";
 
-const responseFormatter: any = {}
+const responseFormatter: any = {};
 
 responseFormatter.send = (ctx: any, err: Error) => {
   try {
@@ -10,18 +10,21 @@ responseFormatter.send = (ctx: any, err: Error) => {
       status: ctx.status,
       data: JSON.parse(JSON.stringify(ctx.body || null)),
       errors: err || null
-    }
+    };
   } catch (err) {
-    throw err
+    throw err;
   }
-}
+};
 
 responseFormatter.formatValidationErrors = (validationErrors: any) => {
-  const formattedResponse = Object.keys(validationErrors.errors).reduce((errorsAcc: any, field: string) => {
-    errorsAcc[field] = validationErrors.errors[field].message
-    return errorsAcc
-  }, {})
-  return formattedResponse
-}
+  const formattedResponse = Object.keys(validationErrors.errors).reduce(
+    (errorsAcc: any, field: string) => {
+      errorsAcc[field] = validationErrors.errors[field].message;
+      return errorsAcc;
+    },
+    {}
+  );
+  return formattedResponse;
+};
 
-export default responseFormatter
+export default responseFormatter;

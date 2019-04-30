@@ -1,5 +1,5 @@
-import mongoose from 'mongoose'
-import { schemaUtils } from '../../utils/models/schemaUtils'
+import mongoose from "mongoose";
+import { schemaUtils } from "../../utils/models/schemaUtils";
 
 const notificationSchema = new mongoose.Schema({
   origin: {
@@ -20,8 +20,8 @@ const notificationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Date,
     default: Date.now()
   }
-})
+});
 
-notificationSchema.pre('save', schemaUtils.setPropertyDate('updatedAt'))
+notificationSchema.pre("save", schemaUtils.setPropertyDate("updatedAt"));
 
-export default notificationSchema
+export default notificationSchema;

@@ -1,40 +1,48 @@
-import mongoose from 'mongoose'
-import userNotificationSchema from './sub/UserNotification'
-import Image from './sub/Image'
-import { schemaValidator, schemaUtils, schemaValidatorMessages } from '../utils/models/schemaUtils'
-import { userValidator, userRecordUtils, userValidationErrors } from '../utils/models/userUtils'
-import { UserNamespace } from 'User'
+import mongoose from "mongoose";
+import { UserNamespace } from "User";
+import {
+  schemaUtils,
+  schemaValidator,
+  schemaValidatorMessages
+} from "../utils/models/schemaUtils";
+import {
+  userRecordUtils,
+  userValidationErrors,
+  userValidator
+} from "../utils/models/userUtils";
+import Image from "./sub/Image";
+import UserNotification from "./sub/UserNotification";
 
 const userSchema = new mongoose.Schema(
   {
     firstname: {
       type: mongoose.Schema.Types.String,
-      required: [true, schemaValidatorMessages.isRequired('firstname')]
+      required: [true, schemaValidatorMessages.isRequired("firstname")]
     },
     lastname: {
       type: mongoose.Schema.Types.String,
-      required: [true, schemaValidatorMessages.isRequired('lastname')]
+      required: [true, schemaValidatorMessages.isRequired("lastname")]
     },
     email: {
       type: mongoose.Schema.Types.String,
       unique: true,
-      required: [true, schemaValidatorMessages.isRequired('e-mail')]
+      required: [true, schemaValidatorMessages.isRequired("e-mail")]
     },
     password: {
       type: mongoose.Schema.Types.String,
-      required: [true, schemaValidatorMessages.isRequired('password')]
+      required: [true, schemaValidatorMessages.isRequired("password")]
     },
     settings: {
       type: mongoose.Schema.Types.Mixed,
       default: {
-        language: 'de',
+        language: "de",
         receiveNotifications: true
       }
     },
     optionalInformation: {
       type: mongoose.Schema.Types.Mixed,
       default: {
-        major: '',
+        major: "",
         expectedGraduation: {
           month: null,
           year: null
@@ -43,16 +51,16 @@ const userSchema = new mongoose.Schema(
     },
     bookmarkedProjects: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Project',
+      ref: "Project",
       default: []
     },
     authorization: {
       type: mongoose.Schema.Types.String,
-      default: 'IS_USER',
-      enum: ['IS_USER', 'IS_MODERATOR', 'IS_SUPERUSER']
+      default: "IS_USER",
+      enum: ["IS_USER", "IS_MODERATOR", "IS_SUPERUSER"]
     },
     notifications: {
-      type: [userNotificationSchema],
+      type: [UserNotification],
       default: []
     },
     image: {
@@ -64,7 +72,7 @@ const userSchema = new mongoose.Schema(
     },
     verificationCode: {
       type: mongoose.Schema.Types.String,
-      default: ''
+      default: ""
     },
     isVerified: {
       type: mongoose.Schema.Types.Boolean,
@@ -83,23 +91,23 @@ const userSchema = new mongoose.Schema(
     toObject: { virtuals: true },
     toJSON: { virtuals: true }
   }
-)
-userSchema.pre('validate', userRecordUtils.setNameOfEmail)
-userSchema.pre('validate', userValidator.validateEmail)
+);
+userSchema.pre("validate", userRecordUtils.setNameOfEmail);
+userSchema.pre("validate", userValidator.validateEmail);
 userSchema.pre(
-  'validate',
+  "validate",
   schemaValidator.validateProperty(
-    'email',
-    async function (query: string) {
-      return !(await Promise.resolve(User.find(query) as any)).length
+    "email",
+    async function(query: string) {
+      return !(await Promise.resolve(User.find(query) as any)).length;
     },
     userValidationErrors.uniqueEmail
   )
-)
-userSchema.pre('validate', userValidator.validatePassword)
-userSchema.pre('validate', userRecordUtils.setHashedPassword)
-userSchema.pre('validate', schemaUtils.setPropertyDate('updatedAt'))
+);
+userSchema.pre("validate", userValidator.validatePassword);
+userSchema.pre("validate", userRecordUtils.setHashedPassword);
+userSchema.pre("validate", schemaUtils.setPropertyDate("updatedAt"));
 
-const User = mongoose.model<UserNamespace.UserInterface>('User', userSchema)
+const User = mongoose.model<UserNamespace.UserInterface>("User", userSchema);
 
-export default User
+export default User;
