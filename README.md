@@ -2,7 +2,7 @@
 
 [![Standard - JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-HSDConnect is a Plattform to find Projects and Collaborations within the HSD University.
+HSDConnect is a Plattform to find Projects and Collaborations.
 The architecture is splitted into two seperate parts, this is the API and builds on KoaJS as Web-Framework, MongoDB as document based Database and MongooseJS as ODM.
 
 ### Get started:
